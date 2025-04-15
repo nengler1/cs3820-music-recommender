@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>Melofy - Create Playlist</title>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">
+            <a href="/"><img src="melofy-logo.png" alt="Melofy Logo" id="logo"></a>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <button id="auth-btn" class="nav-link-btn"></button>
+        </div>
+    </nav>
+
+    <main class="dashboard">
+        <!-- Left Panel: Playlist creation and existing playlists -->
+        <section class="left-panel">
+            <form id="create-playlist-form" onsubmit="createPlaylist(event)">
+                <h3>Create New Playlist</h3>
+                <label for="title">Title:</label>
+                <input name="title" id="title" required>
+                <label for="cover-image">Cover Image:</label>
+                <input type="file" accept="image/jpeg" id="cover-image" name="cover-image">
+                <button type="submit">Create</button>
+            </form>
+            <h3 id="playlist-loc">Playlists:</h3><br>
+            <div id="playlist-list"></div>
+        </section>
+
+        <!-- Middle Panel: Playlist Details -->
+        <section class="middle-panel">
+            <div id="playlist-details">
+                <p>Select a playlist to view its details.</p>
+            </div>
+        </section>
+
+        <!-- Right Panel: Search and export -->
+        <section class="right-panel">
+            <form id="search-form" onsubmit="searchSongs(event)">
+                <label for="search-query" id="search-title">Search:</label>
+                <input type="text" id="search-query" placeholder="Enter a Song or Artist">
+                <button type="submit">Search</button>
+            </form>
+            <div id="search-results"></div>
+            <button id="export-button" onclick="exportCurrentPlaylist()">Export to Spotify</button>
+        </section>
+    </main>
+
+
+    <script src="fetchapi.js"></script>
+</body>
+</html>
