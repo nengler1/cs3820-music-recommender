@@ -404,6 +404,7 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 				await delay(retry)
 				continue
 			}
+
 			const data = await sp_res.json()
 
 			console.log(data)
@@ -414,42 +415,16 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 
 			data.items.forEach(async item => {
 				const track = item.track
-				const artists = track.artists.map(a => a.name).join(", ")
-				const artist_nospaces = artists.replaceAll(" ", "+")
-				const track_nospaces = track.name.replaceAll(" ", "+")
-
-				const lfm_res = await fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${process.env.LFM_API_KEY}&artist=${artist_nospaces}&track=${track_nospaces}&format=json`)
-				await delay(100)
-				let lfm_data = await lfm_res.json()
-
-				if(lfm_data.error){
-					lfm_data.track = {toptags: {tag: []}}
-					if(lfm_data.error === 29){
-						console.log("message:", lfm_data.message)
-					}
-				}
-				const tags = lfm_data.track.toptags.tag.map(tag => tag.name).join(", ")
-
-				if(!lfm_data.track.mbid){
-					lfm_data.track.mbid = ''
-				}
-				const mbid = lfm_data.track.mbid
-
-				const listeners = lfm_data.track.listeners
-				const playcount = lfm_data.track.playcount
-
-				console.log(`Artist - Track: ${artists} - ${track.name}; Tags:`, tags)
-				console.log("MBID:", mbid)
 
 				all_tracks.push({
-					name: track.name,
-					artist: artists,
-					uri: track.uri,
+					spotify_id: track.id,
+					album_id: track.album.id,
+					track_name: track.name,
+					artist: track.artists[0].name,
+					artist_id: track.artists[0].id,
+					duration: track.duration_ms,
+					explicit: track.explicit,
 					popularity: track.popularity,
-					tags: tags,
-					mbid: mbid,
-					listeners: listeners,
-					playcount: playcount,
 					album_image: track.album.images[0]?.url || '',
 				})
 			})
@@ -461,22 +436,18 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 		}
 
 		const saved_tracks_db = db.prepare(`
-			INSERT OR IGNORE INTO saved_tracks (user_id, name, artist, uri, popularity, tags, mbid, listeners, playcount, album_image) 
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT OR IGNORE INTO Track (spotify_id, album_id, track_name, duration_ms, explicit, popularity) 
+			VALUES (?, ?, ?, ?, ?, ?)
 		`)
 
 		for(const track of all_tracks){
 			saved_tracks_db.run([
-				userID,
-				track.name,
-				track.artist,
-				track.uri,
+				track.spotify_id,
+				track.album_id,
+				track.track_name,
+				track.duration,
+				track.explicit,
 				track.popularity,
-				track.tags,
-				track.mbid,
-				track.listeners,
-				track.playcount,
-				track.album_image
 			])
 		}
 
@@ -758,6 +729,55 @@ app.delete('/api/playlists/:playlistId/tracks/:trackId', (req, res) => {
 	res.status(204).send()
 })
 */
+
+// -- Collaborative Filtering Recommendations --
+
+// Import the collaborative filtering module
+const { spawn } = require('child_process');
+
+// Endpoint to get collaborative filtering recommendations
+app.get('/api/recommendations/collaborative', isAuthenticated, (req, res) => {
+    const userID = req.session.spotifyID;
+    const numRecommendations = parseInt(req.query.limit) || 10;
+    
+    if (!userID) {
+        return res.status(401).json({ error: 'Not logged in' });
+    }
+    
+    // Run the Python script to get recommendations
+    const pythonProcess = spawn('python', ['cf.py', userID, numRecommendations.toString()]);
+    
+    let dataString = '';
+    let errorString = '';
+    
+    // Collect data from stdout
+    pythonProcess.stdout.on('data', (data) => {
+        dataString += data.toString();
+    });
+    
+    // Collect data from stderr
+    pythonProcess.stderr.on('data', (data) => {
+        errorString += data.toString();
+    });
+    
+    // Handle process completion
+    pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+            console.error(`Python process exited with code ${code}`);
+            console.error(`Error: ${errorString}`);
+            return res.status(500).json({ error: 'Failed to generate recommendations' });
+        }
+        
+        try {
+            // Parse the JSON output from the Python script
+            const recommendations = JSON.parse(dataString);
+            res.json(recommendations);
+        } catch (error) {
+            console.error('Error parsing recommendations:', error);
+            res.status(500).json({ error: 'Failed to parse recommendations' });
+        }
+    });
+});
 
 app.listen(port, () => {
     console.log(`Listening at port ${port}`)
