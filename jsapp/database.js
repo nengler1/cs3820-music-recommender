@@ -13,7 +13,7 @@ const db = new sqlite3.Database('./sqlite3.db', sqlite3.OPEN_READWRITE | sqlite3
 // Create Tables
 db.serialize(() => {
     // user
-    db.run(`CREATE TABLE IF NOT EXISTS users (
+    db.run(`CREATE TABLE IF NOT EXISTS Users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         spotify_id TEXT UNIQUE,
         name TEXT
@@ -21,7 +21,7 @@ db.serialize(() => {
     `)
 
     // admins
-    db.run(`CREATE TABLE IF NOT EXISTS admins (
+    db.run(`CREATE TABLE IF NOT EXISTS Admins (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         hashed_password TEXT NOT NULL,
@@ -30,7 +30,7 @@ db.serialize(() => {
     `)
     
     // playlists
-    db.run(`CREATE TABLE IF NOT EXISTS playlists (
+    db.run(`CREATE TABLE IF NOT EXISTS Playlists (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         user_id INTEGER,
@@ -40,30 +40,53 @@ db.serialize(() => {
     `)
 
     // tracks
-    db.run(`CREATE TABLE IF NOT EXISTS tracks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        artist TEXT,
+    db.run(`CREATE TABLE IF NOT EXISTS Track (
+        spotify_id VARCHAR(50) PRIMARY KEY,
+        album_id INTEGER REFERENCES Album(spotify_id) ON DELETE SET NULL,
+        track_name VARCHAR(255),
+        acousticness FLOAT,
+        danceability FLOAT,
+        duration_ms INTEGER,
+        energy FLOAT,
+        explicit BOOLEAN NOT NULL DEFAULT FALSE,
+        instrumentalness FLOAT,
+        key INTEGER,
+        liveness FLOAT,
+        loudness FLOAT,
+        mode INTEGER,
         popularity INTEGER,
-        uri TEXT,
-        playlist_id INTEGER,
-        FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
+        speechiness FLOAT,
+        tempo FLOAT,
+        valence FLOAT
+    );
+    `)
+
+    db.run(`CREATE TABLE IF NOT EXISTS Track_artist (
+        track_id VARCHAR(50) REFERENCES Track(spotify_id) ON DELETE CASCADE,
+        artist_id INTEGER REFERENCES Artist(spotify_id) ON DELETE CASCADE,
+        PRIMARY KEY (track_id, artist_id)
+    );
+    `)
+
+
+    db.run(`CREATE TABLE IF NOT EXISTS Artist (
+        spotify_id VARCHAR(50) PRIMARY KEY,
+        artist_name VARCHAR(255) NOT NULL
+    );
+    `)
+
+    db.run(`CREATE TABLE IF NOT EXISTS Album (
+        spotify_id VARCHAR(50) PRIMARY KEY,
+        ablum_name VARCHAR(255),
+        album_cover VARCHAR(255)
     );
     `)
 
     //saved tracks
-    db.run(`CREATE TABLE IF NOT EXISTS saved_tracks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        artist TEXT NOT NULL,
-        uri TEXT UNIQUE,
-        popularity INTEGER,
-        tags TEXT,
-        mbid TEXT,
-        listeners INTEGER,
-        playcount INTEGER,
-        album_image TEXT
+    db.run(`CREATE TABLE IF NOT EXISTS Saved_Tracks (
+        user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
+        track_id VARCHAR(50) REFERENCES Track(spotify_id) ON DELETE CASCADE,
+        PRIMARY KEY (user_id, track_id)
     );
     `)
 })
