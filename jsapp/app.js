@@ -440,6 +440,17 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 			VALUES (?, ?, ?, ?, ?, ?)
 		`)
 
+		const artist_table = db.prepare(`
+			INSERT OR IGNORE INTO Artist (spotify_id, artist_name)
+			VALUES (?, ?)
+		`)
+
+		const user_track_link = db.prepare(`
+			INSERT OR IGNORE INTO Saved_Tracks (user_id, track_id)
+			VALUES (?, ?)
+		`)
+
+		// NEED ARTIST NAME AND ALBUM COVER URL !!!
 		for(const track of all_tracks){
 			saved_tracks_db.run([
 				track.spotify_id,
@@ -449,7 +460,13 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 				track.explicit,
 				track.popularity,
 			])
+
+			user_track_link.run([
+				userID,
+				track.spotify_id,
+			])
 		}
+		
 
 		res.json({message: `Stored ${all_tracks.length} liked tracks`})
 
