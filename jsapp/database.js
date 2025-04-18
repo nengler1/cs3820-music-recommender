@@ -61,6 +61,7 @@ db.serialize(() => {
     );
     `)
 
+    // track artist linking table
     db.run(`CREATE TABLE IF NOT EXISTS Track_artist (
         track_id VARCHAR(50) REFERENCES Track(spotify_id) ON DELETE CASCADE,
         artist_id INTEGER REFERENCES Artist(spotify_id) ON DELETE CASCADE,
@@ -82,13 +83,46 @@ db.serialize(() => {
     );
     `)
 
-    //saved tracks
+    // saved tracks
     db.run(`CREATE TABLE IF NOT EXISTS Saved_Tracks (
         user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
         track_id VARCHAR(50) REFERENCES Track(spotify_id) ON DELETE CASCADE,
         PRIMARY KEY (user_id, track_id)
     );
     `)
+
+    // collaborative reccomendations
+    db.run(`CREATE TABLE IF NOT EXISTS Collaborative_Recommendations (
+        user_id INTEGER REFERENCES Users(id),
+        track_id TEXT REFERENCES Track(spotify_id),
+        score REAL,
+        PRIMARY KEY (user_id, track_id)
+    );
+    `)
+
+    // content reccomendations
+    db.run(`CREATE TABLE IF NOT EXISTS Content_Recommendations (
+        user_id INTEGER REFERENCES Users(id),
+        track_id TEXT REFERENCES Track(spotify_id),
+        score REAL,
+        PRIMARY KEY (user_id, track_id)
+    );`)
+
+    // alter table
+    /*
+    db.run(`ALTER TABLE Track 
+        ADD COLUMN artist_name VARCHAR(255)
+    ;`)
+    db.run(`ALTER TABLE Track 
+        ADD COLUMN album_name VARCHAR(255)
+    ;`)
+    db.run(`ALTER TABLE Track 
+        ADD COLUMN album_cover VARCHAR(255)
+    ;`)
+    db.run(`ALTER TABLE Track
+        ADD COLUMN artist_id VARCHAR(255)
+    ;`)
+    */
 })
 
 module.exports = db

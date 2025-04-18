@@ -1,5 +1,7 @@
 *.swp
 .env
+.env*
 .db
 *.db
 jsapp\node_modules\
+\node_modules
