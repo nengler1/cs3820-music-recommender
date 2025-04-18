@@ -36,6 +36,32 @@ app.use((req, res, next) => {
     next()
 })
 
+// AI Features
+const fs = require('fs')
+const csv = require('csv-parser')
+
+const track_features = new Map();
+const artist_features = new Map();
+
+function normalizeName(name) {
+  return name?.toLowerCase().replace(/[\s\W]+/g, '');
+}
+
+function csvToMap(filePath, keyField, map, normalize) {
+  return new Promise((resolve) => {
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', row => {
+        const key = normalize ? normalizeName(row[keyField]) : row[keyField]
+        map.set(key, row)
+      })
+      .on('end', () => {
+        console.log(`Loaded ${map.size} from ${filePath}`)
+        resolve()
+      })
+  })
+}
+
 // Admin Features
 const { authenticate, hashPassword } = require('./users') // hashing passwords in users.js
 
@@ -378,6 +404,7 @@ app.get('/api/me/top-tracks', async (req, res) => {
 	}
 })
 
+// ENDPOINT FOR AI AND DATABASE
 app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 	const accessToken = req.session.accessToken
 	const userID = req.session.spotifyID
@@ -416,15 +443,35 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 			data.items.forEach(async item => {
 				const track = item.track
 
+				const audio = track_features.get(track.id)
+				let fallback = null
+
+				if(!audio){
+					const norm_artist_name = normalizeName(track.artists[0].name)
+					fallback = artist_features.get(norm_artist_name)
+				}
+
 				all_tracks.push({
 					spotify_id: track.id,
 					album_id: track.album.id,
 					track_name: track.name,
+					acousticness: parseFloat(audio?.acousticness || fallback?.acousticness) || null,
+					danceability: parseFloat(audio?.danceability || fallback?.danceability) || null,
+					duration: track.duration_ms,
+					energy: parseFloat(audio?.energy || fallback?.energy) || null,
+					explicit: track.explicit,
+					instrumentalness: parseFloat(audio?.instrumentalness || fallback?.instrumentalness) || null,
+					key: parseFloat(audio?.key || fallback?.key) || null,
+					liveness: parseFloat(audio?.liveness || fallback?.liveness) || null,
+					loudness: parseFloat(audio?.loudness || fallback?.loudness) || null,
+					mode: parseFloat(audio?.mode || fallback?.mode) || null,
+					popularity: track.popularity,
+					speechiness: parseFloat(audio?.speechiness || fallback?.speechiness) || null,
+					tempo: parseFloat(audio?.tempo || fallback?.tempo) || null,
+					valence: parseFloat(audio?.valence || fallback?.valence) || null,
 					artist: track.artists[0].name,
 					artist_id: track.artists[0].id,
-					duration: track.duration_ms,
-					explicit: track.explicit,
-					popularity: track.popularity,
+					album_name: track.album.name,
 					album_image: track.album.images[0]?.url || '',
 				})
 			})
@@ -432,17 +479,18 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 			offset += 50
 			finished = data.items.length < 50
 
-			await delay(2000) // 2 seconds
+			await delay(5000) // 5 seconds
 		}
 
 		const saved_tracks_db = db.prepare(`
-			INSERT OR IGNORE INTO Track (spotify_id, album_id, track_name, duration_ms, explicit, popularity) 
-			VALUES (?, ?, ?, ?, ?, ?)
-		`)
-
-		const artist_table = db.prepare(`
-			INSERT OR IGNORE INTO Artist (spotify_id, artist_name)
-			VALUES (?, ?)
+			INSERT OR IGNORE INTO Track (
+			spotify_id, album_id, track_name, 
+			acousticness, danceability, duration_ms, 
+			energy, explicit, instrumentalness, 
+			key, liveness, loudness, mode, popularity, 
+			speechiness, tempo, valence, 
+			artist_name, album_name, album_cover, artist_id
+			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`)
 
 		const user_track_link = db.prepare(`
@@ -456,9 +504,24 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 				track.spotify_id,
 				track.album_id,
 				track.track_name,
+				track.acousticness,
+				track.danceability,
 				track.duration,
+				track.energy,
 				track.explicit,
+				track.instrumentalness,
+				track.key,
+				track.liveness,
+				track.loudness,
+				track.mode,
 				track.popularity,
+				track.speechiness,
+				track.tempo,
+				track.valence,
+				track.artist,
+				track.artist_id,
+				track.album_name,
+				track.album_image,
 			])
 
 			user_track_link.run([
@@ -466,8 +529,6 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 				track.spotify_id,
 			])
 		}
-		
-
 		res.json({message: `Stored ${all_tracks.length} liked tracks`})
 
 	} catch(err){
@@ -475,6 +536,66 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 		res.status(500).json({error: 'Failed to fetch saved tracks'})
 	}
 })
+
+/*
+async function backfillTrackMetadata(access_token) {
+	db.serialize(() => {
+	  db.all(`
+		SELECT spotify_id FROM Track
+		WHERE artist_id IS NULL
+	  `, async (err, rows) => {
+		if (err) {
+		  console.error("DB read error:", err)
+		  return
+		}
+  
+		for (const row of rows) {
+		  const spotifyID = row.spotify_id
+  
+		  try {
+			const response = await fetch(`https://api.spotify.com/v1/tracks/${spotifyID}`, {
+			  headers: {
+				Authorization: `Bearer ${access_token}`
+			  }
+			})
+  
+			if (response.status === 429) {
+			  const retry = parseInt(response.headers.get('Retry-After') || '1') * 1000
+			  console.log(`Rate limited. Waiting ${retry / 1000}s...`)
+			  await new Promise(resolve => setTimeout(resolve, retry))
+			  continue
+			}
+  
+			if (!response.ok) {
+			  console.warn(`Failed to fetch track ${spotifyID}:`, await response.text())
+			  continue
+			}
+  
+			const track = await response.json()
+  
+			const artistID = track.artists?.[0]?.id || null
+  
+			db.run(`
+			  UPDATE Track
+			  SET artist_id = ?
+			  WHERE spotify_id = ?
+			`, [artistID, spotifyID], (err) => {
+			  if (err) {
+				console.error(`Error updating ${spotifyID}:`, err.message)
+			  } else {
+				console.log(`Updated ${spotifyID}: ${artistID}`)
+			  }
+			})
+  
+			await new Promise(resolve => setTimeout(resolve, 700)) // delay to avoid hitting rate limits
+		  } catch (err) {
+			console.error(`Error processing ${spotifyID}:`, err)
+		  }
+		}
+	  })
+	})
+  }
+*/
 
 // -- Playlist creation --
 
@@ -747,55 +868,12 @@ app.delete('/api/playlists/:playlistId/tracks/:trackId', (req, res) => {
 })
 */
 
-// -- Collaborative Filtering Recommendations --
-
-// Import the collaborative filtering module
-const { spawn } = require('child_process');
-
-// Endpoint to get collaborative filtering recommendations
-app.get('/api/recommendations/collaborative', isAuthenticated, (req, res) => {
-    const userID = req.session.spotifyID;
-    const numRecommendations = parseInt(req.query.limit) || 10;
-    
-    if (!userID) {
-        return res.status(401).json({ error: 'Not logged in' });
-    }
-    
-    // Run the Python script to get recommendations
-    const pythonProcess = spawn('python', ['cf.py', userID, numRecommendations.toString()]);
-    
-    let dataString = '';
-    let errorString = '';
-    
-    // Collect data from stdout
-    pythonProcess.stdout.on('data', (data) => {
-        dataString += data.toString();
-    });
-    
-    // Collect data from stderr
-    pythonProcess.stderr.on('data', (data) => {
-        errorString += data.toString();
-    });
-    
-    // Handle process completion
-    pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-            console.error(`Python process exited with code ${code}`);
-            console.error(`Error: ${errorString}`);
-            return res.status(500).json({ error: 'Failed to generate recommendations' });
-        }
-        
-        try {
-            // Parse the JSON output from the Python script
-            const recommendations = JSON.parse(dataString);
-            res.json(recommendations);
-        } catch (error) {
-            console.error('Error parsing recommendations:', error);
-            res.status(500).json({ error: 'Failed to parse recommendations' });
-        }
-    });
-});
-
-app.listen(port, () => {
-    console.log(`Listening at port ${port}`)
+Promise.all([
+	csvToMap('data\\tracks_features.csv', 'id', track_features, false),
+	csvToMap('data\\data_by_artist.csv', 'artists', artist_features, true)
+])
+.then(() => {
+	app.listen(port, () => {
+		console.log(`Listening at port ${port}`)
+	})
 })
