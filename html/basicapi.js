@@ -1,6 +1,8 @@
+// send form data to /api using the specified method
 async function fetchAPI(event, method){
     event.preventDefault()
     const formData = new FormData(event.target)
+
     await fetch('/api', {
         method: method,
         headers: {
@@ -9,7 +11,6 @@ async function fetchAPI(event, method){
         body: new URLSearchParams(formData)
     }).then(async res => {
             const data = await res.json()
-            console.log(data)
         })
         .catch(error => {
             console.error("An error has occured:", error)
@@ -17,6 +18,7 @@ async function fetchAPI(event, method){
     listDancers()
 }
 
+// list all dancers on the page
 async function listDancers(){
     await fetch('/api', { 
             method: 'GET'
@@ -26,14 +28,14 @@ async function listDancers(){
             const dancers_list = document.getElementById("all-dancers-list")
             dancers_list.innerHTML = ''
 
-            if (dancers_list.length === 0){
+            if (!dancers_list.length){
                 dancers_list.innerHTML = '<li>No Dancers found</li>'
                 return
             }
 
             dancers.forEach(dancer => {
                 const li = document.createElement('li')
-                li.classList.add('dancer')
+                li.className = 'dancer'
                 li.innerText = `Name: ${dancer.who} | X: ${dancer.x} | Y: ${dancer.y}`
                 dancers_list.appendChild(li)
             })
@@ -43,11 +45,12 @@ async function listDancers(){
         })
 }
 
+// Get a specific dancer by name
 async function getDancer(event){
     event.preventDefault()
     const formData = new FormData(event.target)
-    console.log("GET FORM DATA:", formData)
     const who = new URLSearchParams(formData).toString()
+
     await fetch('/api' + `?${who}`, {
         method: 'GET',
     }).then(async res => {
@@ -74,8 +77,8 @@ async function getDancer(event){
         })
 }
 
-// admins
-
+// -- admins --
+// check if current user is admin and display admin panel
 async function checkAdmin() {
     const res = await fetch('/api/me', {
         method: 'GET',
@@ -92,6 +95,7 @@ async function checkAdmin() {
     }
 }
 
+// load all registered users into the admin user table
 async function loadUsers() {
     const res = await fetch('/api/admin/users', {
         method: 'GET',
@@ -118,11 +122,12 @@ async function loadUsers() {
     })
 }
 
+// create a new user from admin form
 async function createUser(event){
     event.preventDefault()
     const responseDiv = document.getElementById("user-response")
-
     const formData = new FormData(event.target)
+
     const username = formData.get('new-username').toString().trim()
     const password = formData.get('new-password').toString().trim()
     const role = formData.get('new-role').toString().trim()
@@ -139,8 +144,13 @@ async function createUser(event){
         responseDiv.innerText = `User ${data.username} created with role: ${data.role}`
         loadUsers()
     })
+    .catch(error => {
+        responseDiv.innerText = `Error: ${error.message}`
+        console.error("An error has occured:", error)
+    })
 }
 
+// update user role
 async function updateUser(userId, newRole) {
     const res = await fetch(`/api/admin/users/${userId}`, {
         method: 'PUT',
@@ -149,19 +159,17 @@ async function updateUser(userId, newRole) {
         },
         body: JSON.stringify({ role: newRole })
     })
-
-    const result = await res.json()
 }
 
+// delete user by ID
 async function deleteUser(userId) {
     const res = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
     })
-
-    const result = await res.json()
     loadUsers()
 }
 
+// on admin page load, verify admin
 if(window.location.href.includes("admin.html")){
     const isAdmin = checkAdmin()
     .then(res => {

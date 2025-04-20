@@ -20,11 +20,24 @@
         </div>
     </nav>
     
-    <h1>PROFILE</h1>
-
-    <div id="profile">
-    </div>
-    <a href="create_playlist.html" class="button">Create Playlist</a>
+    <div class="profile-card">
+        <h1>My Profile</h1>
+      
+        <img id="profile-img" src="" alt="Profile Picture" />
+      
+        <div class="profile-info">
+          <p><strong>Username:</strong> <span id="profile-name"></span></p>
+          <p><a id="spotify-link" href="#" target="_blank">Open Spotify Profile</a></p>
+          <p><strong>Followers:</strong> <span id="profile-followers"></span></p>
+        </div>
+      
+        <div class="profile-actions">
+          <button onclick="window.location.href='create_playlist.html'">Create Playlist</button>
+          <button onclick="syncSongs()">Sync Your Songs</button>
+        </div>
+      
+        <div id="sync-status" class="status-msg" style="display:none;"></div>
+      </div>      
 
     <script src="fetchapi.js"></script>
 </body>

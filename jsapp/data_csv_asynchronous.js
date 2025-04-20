@@ -128,7 +128,7 @@ function fillAudioFeatures(){
     })
 }
 
-csvToMap('data\\SpotifyFeatures.csv', 'track_id', track_features, false, () => {
+csvToMap('data\\mr_tracks_dataset.csv', 'id', track_features, false, () => {
     csvToMap('data\\data_by_artist.csv', 'artists', artist_features, true, () => {
         fillAudioFeatures()
     })

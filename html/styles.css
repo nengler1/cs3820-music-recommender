@@ -152,6 +152,8 @@ p {
 
 /* How It Works Section */
 .how-it-works {
+    align-items: center;
+    text-align: center;
     padding: 40px 20px;
 }
 
@@ -176,6 +178,7 @@ p {
 
 /* Call to Action */
 .cta {
+    text-align: center;
     padding: 40px 100px;
 }
 
@@ -249,6 +252,9 @@ input[type="file"] {
     background-color: white;
     width: 100%;
 }
+
+/* Profile */
+
 
 /* Playlists */
 /* Layout Panels */

@@ -3,5 +3,9 @@
 .env*
 .db
 *.db
-jsapp\node_modules\
+
+node_modules
 \node_modules
+
+\data
+data

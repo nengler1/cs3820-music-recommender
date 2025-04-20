@@ -28,7 +28,7 @@
                 <label for="title">Title:</label>
                 <input name="title" id="title" required>
                 <label for="cover-image">Cover Image:</label>
-                <input type="file" accept="image/jpeg" id="cover-image" name="cover-image">
+                <input type="file" accept="image/jpeg,image/jpg" id="cover-image" name="cover-image">
                 <button type="submit">Create</button>
             </form>
             <h3 id="playlist-loc">Playlists:</h3><br>
@@ -56,5 +56,6 @@
 
 
     <script src="fetchapi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@1.0.16/dist/browser-image-compression.js"></script>
 </body>
 </html>

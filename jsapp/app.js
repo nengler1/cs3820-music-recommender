@@ -20,21 +20,10 @@ app.use(session({
 const db = require('./database')
 
 // parsing "application/x-www-form-urlencoded"
-app.use(bodyParser.urlencoded({extended: true, limit: '2mb' }))
-app.use(bodyParser.json({limit: '2mb'}))
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
 
 app.use(express.json())
-
-app.use((req, res, next) => {
-    const contentLength = parseInt(req.headers['content-length'] || '0')
-    const MAX_SIZE = 2048 * 1024 // 1MB
-
-    if(contentLength > MAX_SIZE){
-        return res.status(413).json({error: 'Image too large. Max 2MB allowed.'})
-    }
-
-    next()
-})
 
 // AI Features
 const fs = require('fs')
@@ -222,6 +211,7 @@ app.get('/api/login', (req, res) => {
 		'user-library-read',
 		'user-read-recently-played',
 		'user-read-playback-position',
+		'ugc-image-upload',
 		'playlist-modify-public',
 		'playlist-modify-private',
 	]
@@ -499,7 +489,7 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 		`)
 
 		// NEED ARTIST NAME AND ALBUM COVER URL !!!
-		for(const track of all_tracks){
+		all_tracks.forEach(track => {
 			saved_tracks_db.run([
 				track.spotify_id,
 				track.album_id,
@@ -528,7 +518,8 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 				userID,
 				track.spotify_id,
 			])
-		}
+		})
+
 		res.json({message: `Stored ${all_tracks.length} liked tracks`})
 
 	} catch(err){
@@ -608,10 +599,11 @@ app.post('/api/playlists', isAuthenticated, (req, res) => {
 
 	const userID = req.session.spotifyID;
 
-    db.run(`INSERT INTO playlists (title, user_id, cover_image) VALUES (?, ?, ?)`, 
+    db.run(`INSERT INTO Playlists (title, user_id, cover_image) VALUES (?, ?, ?)`, 
         [title, userID, imageBase64], 
         function(err){
             if(err){
+				console.error(err)
 				return res.status(500).json({ error: "Database error" })
 			}
             res.status(201).json({ id: this.lastID, title })
@@ -623,10 +615,11 @@ app.post('/api/playlists', isAuthenticated, (req, res) => {
 app.get('/api/playlists', isAuthenticated, (req, res) => {
     const userID = req.session.spotifyID;
 
-    db.all(`SELECT * FROM playlists WHERE user_id = ?`, 
+    db.all(`SELECT * FROM Playlists WHERE user_id = ?`, 
         [userID], 
         (err, row) => {
             if(err || !row){
+				console.error(err)
 				return res.status(500).json({ error: "Database error" })
 			}
             res.json(row)
@@ -639,10 +632,11 @@ app.delete('/api/playlists/:id', isAuthenticated, (req, res) => {
     const playlistID = req.params.id;
     const userID = req.session.spotifyID;
 
-    db.run(`DELETE FROM playlists WHERE id = ? AND user_id = ?`, 
+    db.run(`DELETE FROM Playlists WHERE id = ? AND user_id = ?`, 
         [playlistID, userID], 
         function(err){
             if(err){
+				console.error(err)
 				return res.status(500).json({ error: "Database error" })
 			}
             if(this.changes === 0){
@@ -657,20 +651,26 @@ app.delete('/api/playlists/:id', isAuthenticated, (req, res) => {
 
 // add a track to playlist
 app.post('/api/playlists/:id/tracks', isAuthenticated, (req, res) => {
-    const { name, artist, popularity, uri } = req.body
+    const { name, artist, uri } = req.body
     const playlistID = req.params.id
     const userID = req.session.spotifyID
 
-    db.get(`SELECT * FROM playlists WHERE id = ? AND user_id = ?`, 
+    db.get(`SELECT * FROM Playlists WHERE id = ? AND user_id = ?`, 
         [playlistID, userID], 
         (err, playlist) => {
-            if(err) return res.status(500).json({error: "Database error"})
+            if(err){
+				console.error(err)
+				return res.status(500).json({error: "Database error"})
+			}
             if(!playlist) return res.status(403).json({error: "Unauthorized"})
 
-            db.run(`INSERT INTO tracks (name, artist, popularity, uri, playlist_id) VALUES (?, ?, ?, ?, ?)`, 
-                [name, artist, popularity, uri, playlistID], 
+            db.run(`INSERT INTO Tracks_for_Playlists (name, artist, uri, playlist_id) VALUES (?, ?, ?, ?)`, 
+                [name, artist, uri, playlistID], 
                 function(err){
-                    if(err) return res.status(500).json({error: "Database error"})
+                    if(err){
+						console.error(err)
+						return res.status(500).json({error: "Database error"})
+					}
                     res.status(201).json({id: this.lastID, name, artist})
                 }
             )
@@ -686,10 +686,13 @@ app.get('/api/playlists/:id/tracks', isAuthenticated, (req, res) => {
     db.get(`SELECT * FROM playlists WHERE id = ? AND user_id = ?`, 
         [playlistID, userID], 
         (err, playlist) => {
-            if(err) return res.status(500).json({ error: "Database error" })
+            if(err){
+				console.error(err)
+				return res.status(500).json({ error: "Database error" })
+			}
             if(!playlist) return res.status(403).json({ error: "Unauthorized" })
 
-            db.all(`SELECT * FROM tracks WHERE playlist_id = ?`, 
+            db.all(`SELECT * FROM Tracks_for_Playlists WHERE playlist_id = ?`, 
                 [playlistID], 
                 (err, tracks) => {
                     if(err) return res.status(500).json({ error: "Database error" })
@@ -708,10 +711,13 @@ app.delete('/api/playlists/:playlistID/tracks/:trackID', isAuthenticated, (req, 
     db.get(`SELECT * FROM playlists WHERE id = ? AND user_id = ?`, 
         [playlistID, userID], 
         (err, playlist) => {
-            if(err) return res.status(500).json({ error: "Database error" })
+            if(err){
+				console.error(err)
+				return res.status(500).json({ error: "Database error" })
+			}
             if(!playlist) return res.status(403).json({ error: "Unauthorized" })
 
-            db.run(`DELETE FROM tracks WHERE id = ? AND playlist_id = ?`, 
+            db.run(`DELETE FROM Tracks_for_Playlists WHERE id = ? AND playlist_id = ?`, 
                 [trackID, playlistID], 
                 function(err){
                     if(err) return res.status(500).json({ error: "Database error" })
@@ -723,19 +729,22 @@ app.delete('/api/playlists/:playlistID/tracks/:trackID', isAuthenticated, (req, 
     )
 })
 
+app.get()
+
 // get the users playlist when given their id and the playlist id from database
 const getUserPlaylist = (userID, playlistID, callback) => {
 	db.get(`SELECT * FROM playlists WHERE id = ? AND user_id = ?`, 
         [playlistID, userID], 
         (err, playlist) => {
             if(err || !playlist){
+				console.error(err)
 				callback(null)
 			}
             if(this.changes === 0){
 				callback(null)
 			}
 
-			db.all(`SELECT * FROM tracks WHERE playlist_id = ?`,
+			db.all(`SELECT * FROM Tracks_for_Playlists WHERE playlist_id = ?`,
 				[playlistID], 
 				(err2, tracks) => {
 					if(err2){
@@ -749,6 +758,8 @@ const getUserPlaylist = (userID, playlistID, callback) => {
         }
     )
 }
+
+
 
 // export playlist to Spotify
 app.post('/api/playlists/:id/export', isAuthenticated, async (req, res) => {
@@ -791,18 +802,18 @@ app.post('/api/playlists/:id/export', isAuthenticated, async (req, res) => {
 
 		// uploading user cover image
 		if(playlist.cover_image){
-			console.log(accessToken)
 			const image_upload_fetch = await fetch(`https://api.spotify.com/v1/playlists/${created_playlist.id}/images`, {
 				method: 'PUT',
 				headers: {
-					Authorization: `Bearer ${accessToken}`,
-					'Content-Type': 'image/jpeg'
+					'Authorization': `Bearer ${accessToken}`,
+					'Content-Type': 'image/jpeg',
 				},
 				body: playlist.cover_image
 			})
 
 			if(!image_upload_fetch.ok){
-				console.warn("Failed to upload playlist image")
+				const err = await image_upload_fetch.text()
+				console.warn("Failed to upload playlist image:", err)
 			}
 		}
 
@@ -825,52 +836,9 @@ app.post('/api/playlists/:id/export', isAuthenticated, async (req, res) => {
 	})
 })
 
-/*
-// Add tracks
-app.post('/api/playlists/:id/tracks', (req, res) => {
-	const playlist = playlists[req.params.id]
-	if(!playlist){
-		return res.status(404).json({ message: 'No playlist found'})
-	}
-	const { name, artist } = req.body
-	const track = { id: crypto.randomUUID(), name, artist }
-	playlist.tracks.push(track)
-	res.status(201).json(track)
-})
-
-// Update track in playlist
-app.put('/api/playlists/:playlistId/tracks/:trackId', (req, res) => {
-	const playlist = playlists[req.params.playlistId]
-	if(!playlist){
-		return res.status(404).json({ message: 'No playlist found'})
-	}
-	const track = playlist.tracks.find(t => t.id === req.params.trackId)
-	if(!track){
-		return res.status(404).json({ message: 'No track found'})
-	}
-	track.name = req.body.name || track.name
-	track.artist = req.body.artist || track.artist
-	res.json(track)
-})
-
-// Delete track from playlist
-app.delete('/api/playlists/:playlistId/tracks/:trackId', (req, res) => {
-	const playlist = playlists[req.params.playlistId]
-	if(!playlist){
-		return res.status(404).json({ message: 'Playlist not found' })
-	}
-	const trackIndex = playlist.tracks.findIndex(t => t.id === req.params.trackId)
-	if(trackIndex === -1){
-		return res.status(404).json({ message: 'Track not found' })
-	}
-	playlist.tracks.splice(trackIndex, 1)
-	res.status(204).send()
-})
-*/
-
 Promise.all([
-	csvToMap('data\\tracks_features.csv', 'id', track_features, false),
-	csvToMap('data\\data_by_artist.csv', 'artists', artist_features, true)
+	csvToMap('data/mr_tracks_dataset.csv', 'id', track_features, false),
+	csvToMap('data/data_by_artist.csv', 'artists', artist_features, true)
 ])
 .then(() => {
 	app.listen(port, () => {

@@ -39,7 +39,18 @@ db.serialize(() => {
     );
     `)
 
-    // tracks
+    // tracks for playlists
+    db.run(`CREATE TABLE IF NOT EXISTS Tracks_for_Playlists (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        artist TEXT,
+        uri TEXT,
+        playlist_id INTEGER,
+        FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
+    );
+    `)
+
+    // track (for ai model)
     db.run(`CREATE TABLE IF NOT EXISTS Track (
         spotify_id VARCHAR(50) PRIMARY KEY,
         album_id INTEGER REFERENCES Album(spotify_id) ON DELETE SET NULL,

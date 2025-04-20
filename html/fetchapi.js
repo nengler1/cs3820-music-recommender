@@ -1,6 +1,7 @@
 const artist_div = document.querySelector('.spotify-track')
 const navbar = document.querySelector('.nav-links')
 
+// check if the user is logged in
 async function checkLoginStatus(){
     return fetch('/api/me/status')
         .then(res => res.json())
@@ -9,6 +10,7 @@ async function checkLoginStatus(){
         })
 }
 
+// update the ui based on login status
 async function changeLogin(){
     const loggedIn = await checkLoginStatus()
     console.log("LOGGED IN:", loggedIn)
@@ -46,6 +48,7 @@ async function changeLogin(){
     }
 }
 
+// sync the liked songs to backend
 async function syncSongs(element){
     try {
         const res = await fetch('/api/me/saved-tracks')
@@ -58,21 +61,19 @@ async function syncSongs(element){
     element.style.display = 'none'
 }
 
+// display spotify profile info
 async function getProfile(){
     await fetch('/api/me/profile')
         .then(response => response.json())
         .then(details => {
-            const profileDiv = document.getElementById('profile')
-            
-            profileDiv.innerHTML = `
-                <h3><strong>Username:</strong> ${details.name}</h3>
-                <img src="${details.profileImage}" alt=${details.name} Image><br>
-                <a href="${details.spotifyProfileLink}"><strong>Link to Spotify Profile</strong></a>
-                <h3><strong>Number of Followers:</strong> ${details.followers}</h3>
-            `
+            document.getElementById('profile-img').src = details.profileImage
+            document.getElementById('profile-name').textContent = details.name
+            document.getElementById('spotify-link').href = details.spotifyProfileLink
+            document.getElementById('profile-followers').textContent = details.followers
         })
 }
 
+// show user's top tracks
 function getTopArtists(){
     fetch('/api/me/top-tracks')
         .then(data => data.json())
@@ -109,9 +110,10 @@ function getTopArtists(){
         )
 }
 
-// playlists
-let currentPlaylistID = null
+// -- playlists --
 
+let currentPlaylistID = null
+// render all playlists in sidebar
 function renderPlaylistList(playlists){
     const list = document.getElementById("playlist-list")
     list.innerHTML = ""
@@ -129,6 +131,7 @@ function renderPlaylistList(playlists){
     })
 }
 
+// show details of selected playlist
 function showPlaylistDetails(playlist){
     currentPlaylistID = playlist.id
     const details = document.getElementById("playlist-details")
@@ -145,6 +148,7 @@ function showPlaylistDetails(playlist){
     getPlaylistTracks(playlist.id)
 }
 
+// create a new playlist with title and cover image
 async function createPlaylist(event){
     event.preventDefault()
     const title = document.getElementById("title").value.trim()
@@ -153,14 +157,23 @@ async function createPlaylist(event){
 
     if(!title || !file) return alert("Please provide title and image.")
 
-    const reader = new FileReader()
-    reader.onload = async function (){
-        const base64 = reader.result.split(",")[1]
+    const options = {
+        maxSizeMB: 0.25, //256KB
+        maxWidthOrHeight: 600,
+        useWebWorker: true
+    }
 
+    try {
+        const compressed_file = await imageCompression(file, options)
+        console.log("Compressed image size:", compressed_file.size, "bytes") // < 256000
+        const base64 = await imageCompression.getDataUrlFromFile(compressed_file)
+        const image_base64 = base64.split(",")[1]
+        const image_base64_v2 = image_base64.replace(/\n/g, "")
+    
         const res = await fetch("/api/playlists", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ title, imageBase64: base64 })
+            body: JSON.stringify({ title, imageBase64: image_base64_v2 })
         })
 
         if(res.ok){
@@ -169,19 +182,24 @@ async function createPlaylist(event){
         } else {
             alert("Failed to create playlist.")
         }
+    
     }
-
-    reader.readAsDataURL(file)
+    catch(err){
+        console.error("Compression failed:", err)
+        alert("Failed to compress or upload image.")
+    }
 }
 
+// fetch and render playlists for current user
 async function listPlaylists(){
     const res = await fetch("/api/playlists")
-    if(!res.ok) return
-
-    const playlists = await res.json()
-    renderPlaylistList(playlists)
+    if(res.ok){
+        const playlists = await res.json()
+        renderPlaylistList(playlists)
+    }
 }
 
+// delete a playlist
 async function deletePlaylist(playlistID){
     if(!confirm("Are you sure you want to delete this playlist?")) return
 
@@ -192,6 +210,8 @@ async function deletePlaylist(playlistID){
     listPlaylists() // refresh sidebar list
 }
 
+
+// get and render all tracks for a playlist
 async function getPlaylistTracks(id){
     const res = await fetch(`/api/playlists/${id}/tracks`)
     const tracks = await res.json()
@@ -205,6 +225,7 @@ async function getPlaylistTracks(id){
     `).join("")
 }
 
+// delete a track from playlist
 async function deleteTrack(playlistID, trackID){
     await fetch(`/api/playlists/${playlistID}/tracks/${trackID}`, {
         method: 'DELETE'
@@ -212,10 +233,13 @@ async function deleteTrack(playlistID, trackID){
     getPlaylistTracks(playlistID)
 }
 
+// search songs and show results
 async function searchSongs(event){
     event.preventDefault()
     const query = document.getElementById("search-query").value.trim()
-    if(!query || !currentPlaylistID) return
+    if(!query || !currentPlaylistID){
+        return
+    }
 
     const res = await fetch(`/api/search-tracks/${encodeURIComponent(query)}`)
     const songs = await res.json()
@@ -233,8 +257,11 @@ async function searchSongs(event){
     })
 }
 
+// add song to playlist
 async function addSong(song){
-    if(!currentPlaylistID) return
+    if(!currentPlaylistID){
+        return
+    }
 
     await fetch(`/api/playlists/${currentPlaylistID}/tracks`, {
         method: "POST",
@@ -245,23 +272,27 @@ async function addSong(song){
     getPlaylistTracks(currentPlaylistID)
 }
 
+// export current playlist to spotify
 async function exportCurrentPlaylist(){
-    if(!currentPlaylistID) return alert("Select a playlist first.")
+    if(!currentPlaylistID){
+        return alert("Select a playlist first.")
+    }
+
     const res = await fetch(`/api/playlists/${currentPlaylistID}/export`, {
         method: "POST"
     })
     const result = await res.json()
 
     if(result.spotifyUrl){
-        alert("Exported! Opening Spotify...")
+        alert("Exported! Opening Spotify.")
         window.open(result.spotifyUrl, '_blank')
     } else {
-        alert("Failed to export playlist.")
+        alert("Failed to export playlist")
     }
 }
 
 
-// pre reqs
+// -- pre reqs --
 changeLogin()
 
 if(window.location.href.includes("profile.html")){
