@@ -210,7 +210,8 @@ p {
 
 
 #create-playlist-form button,
-#search-form button {
+#search-form button,
+#get-recommendations-form {
     font-size: large;
     font-weight: bold;
 }

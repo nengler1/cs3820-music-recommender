@@ -5,7 +5,7 @@ from itertools import combinations
 from collections import defaultdict
 
 
-def load_and_normalize_user_track_data(db_connection):
+def load_user_track_data(db_connection):
     user_ids = pd.read_sql_query("SELECT id, spotify_id FROM Users", db_connection) # Get User's id and Spotify id
     saved_tracks = pd.read_sql_query("SELECT spotify_id, track_id FROM Saved_Tracks", db_connection)
     saved_tracks_by_userid = pd.merge(saved_tracks, user_ids, on='spotify_id', how = 'inner')
@@ -31,7 +31,6 @@ def store_user_similarities(db_connection, similarities):
     user_similarity = pd.DataFrame(similarities, columns = ["user1_id", "user2_id", "similarity"])
     user_similarity.to_sql('User_Similarity', db_connection, if_exists='replace', index = False)
 
-
 def build_user_track_matrix(saved_tracks):
     all_users = saved_tracks['user_id'].unique()
     all_tracks = saved_tracks['track_id'].unique()
@@ -45,7 +44,6 @@ def build_user_track_matrix(saved_tracks):
         matrix[user_index][track_index] = 1.0
     return matrix, all_users, user_to_index, index_to_track
 
-
 def load_user_similarity_map(db_connection):
     user_similarity = pd.read_sql_query("SELECT * FROM User_Similarity", db_connection)
     similarity_map = defaultdict(list)
@@ -54,12 +52,9 @@ def load_user_similarity_map(db_connection):
         similarity_map[row['user2_id']].append((row['user1_id'], row['similarity']))
     return similarity_map
 
-
 def compute_collaborative_recommendations(matrix, all_users, user_to_index, index_to_track, similarity_map, top_k_user_to_compare):
     recommendations = {}
     for user_id in all_users:
-        # user_index = user_to_index[user_id]
-        # user_vector = matrix[user_index]
         neighbors = sorted(similarity_map.get(user_id, []), key=lambda x: x[1], reverse=True)[:top_k_user_to_compare]  # kNN
         if not neighbors:
             continue
@@ -84,7 +79,6 @@ def compute_collaborative_recommendations(matrix, all_users, user_to_index, inde
     print(f"Recommendations for {len(recommendations)} users generated.")
     return recommendations
 
-
 def store_collaborative_recommendations(db_connection, recommendations):
     CF_recommendations = []
     for user_id, items in recommendations.items():
@@ -94,25 +88,16 @@ def store_collaborative_recommendations(db_connection, recommendations):
     recs_df.to_sql('Collaborative_Recommendations', db_connection, if_exists = 'replace', index = False)
 
 
-def normalize_scores(scores):
-    min_score = np.min(scores)
-    max_score = np.max(scores)
-    return np.zeros_like(scores) if max_score - min_score == 0 else (scores - min_score) / (max_score - min_score)
-
-
 top_k_user_to_compare = 10
 recs_per_user = 10000
-db_path = "jsapp\sqlite3.db"
-db_connection = sqlite3.connect(db_path)
 
-saved_tracks, user_saved_tracks_dict = load_and_normalize_user_track_data(db_connection)
+db_path = "jsapp/sqlite3.db"
+db_connection = sqlite3.connect(db_path)
+saved_tracks, user_saved_tracks_dict = load_user_track_data(db_connection)
 similarities = compute_pairwise_user_similarity(user_saved_tracks_dict)
 store_user_similarities(db_connection, similarities)
-
 matrix, all_users, user_to_index, index_to_track = build_user_track_matrix(saved_tracks)
 similarity_map = load_user_similarity_map(db_connection)
-
 recommendations = compute_collaborative_recommendations(matrix, all_users, user_to_index, index_to_track, similarity_map, top_k_user_to_compare)
 store_collaborative_recommendations(db_connection, recommendations)
-
 db_connection.close()

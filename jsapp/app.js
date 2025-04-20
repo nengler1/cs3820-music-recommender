@@ -729,7 +729,79 @@ app.delete('/api/playlists/:playlistID/tracks/:trackID', isAuthenticated, (req, 
     )
 })
 
-app.get()
+app.post('/api/me/recommendations', (req, res) => {
+	const userID = req.session.spotifyID
+	let { title } = req.body
+	const numResults = 20
+	const image_base64 = process.env.SAMPLE_B64_IMAGE
+
+	if(!title){
+		title = "Melofy Recommended Playlist"
+	}
+
+	const query = `
+		SELECT
+            mr.user_id,
+            u.name AS user_name,
+			u.spotify_id,
+            mr.track_id,
+            t.track_name,
+            t.artist_name,
+            mr.score
+        FROM Merged_Recommendations mr
+        JOIN Users u ON mr.user_id = u.id
+        JOIN Track t ON mr.track_id = t.spotify_id
+		WHERE u.spotify_id = ?
+		AND mr.saved = 0
+        ORDER BY mr.score DESC
+		LIMIT ?
+	`
+
+	db.all(query, [userID, numResults], (err, tracks) => {
+		if(err){
+			console.error('Query error:', err.message)
+			return res.status(500).json({error: 'Failed to retrieve recommendations.'})
+		}
+
+		if(tracks.length === 0){
+			return res.status(404).json({message: `No recommendations found for user.`})
+		}
+
+		const user_name = tracks[0].user_name
+		const reccomendations = tracks.map(track => ({
+			track_id: track.track_id,
+			track_name: track.track_name,
+			artist_name: track.artist_name,
+			score: track.score
+		}))
+
+		db.run(`INSERT INTO Playlists (title, user_id, cover_image) VALUES (?, ?, ?)`,
+			[title, userID, image_base64],
+			function(err2){
+				if(err2){
+					console.error("Failed to create playlist:", err2.message)
+					return res.status(500).json({error: "Failed to create playlist."})
+				}
+
+				const new_playlist_ID = this.lastID
+
+				const insert_track = db.prepare(`
+					INSERT INTO Tracks_for_Playlists (name, artist, uri, playlist_id)
+					VALUES (?, ?, ?, ?)
+				`)
+
+				reccomendations.forEach(track => {
+					const uri = `spotify:track:${track.track_id}`
+					insert_track.run([track.track_name, track.artist_name, uri, new_playlist_ID])
+				})
+
+				insert_track.finalize()
+
+				res.status(201).json({id: new_playlist_ID, title})
+			}
+		)
+	})
+})
 
 // get the users playlist when given their id and the playlist id from database
 const getUserPlaylist = (userID, playlistID, callback) => {

@@ -4,7 +4,7 @@ const sqlite3 = require('sqlite3').verbose()
 const db = new sqlite3.Database('./sqlite3.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err){
         console.error("Database Connection Error:", err)
-    } else { 
+    } else {
         console.log("Connected to the SQLite database.")
     }
         
@@ -46,7 +46,7 @@ db.serialize(() => {
         artist TEXT,
         uri TEXT,
         playlist_id INTEGER,
-        FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
+        FOREIGN KEY (playlist_id) REFERENCES Playlists(id) ON DELETE CASCADE
     );
     `)
 
@@ -133,7 +133,9 @@ db.serialize(() => {
     db.run(`ALTER TABLE Track
         ADD COLUMN artist_id VARCHAR(255)
     ;`)
+    db.run(`DROP TABLE Tracks_for_Playlists`)
     */
+   
 })
 
 module.exports = db

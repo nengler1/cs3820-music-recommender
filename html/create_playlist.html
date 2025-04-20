@@ -33,6 +33,13 @@
             </form>
             <h3 id="playlist-loc">Playlists:</h3><br>
             <div id="playlist-list"></div>
+
+            <form id="get-recommendations-form" onsubmit="createRecommendedPlaylist(event)">
+                <h3>Create Playlist from Recommendations</h3>
+                <label for="title2">Title:</label>
+                <input name="title2" id="title2" required>
+                <button type="submit">Generate Playlist</button>
+            </form>
         </section>
 
         <!-- Middle Panel: Playlist Details -->

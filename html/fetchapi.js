@@ -190,6 +190,32 @@ async function createPlaylist(event){
     }
 }
 
+async function createRecommendedPlaylist(event){
+    event.preventDefault()
+    const title = document.getElementById("title2").value.trim()
+
+    fetch('/api/me/recommendations', {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({title: title})
+    })
+    .then(async res => {
+        const data = await res.json()
+        if(res.ok){
+            console.log
+            alert(`Playlist "${data.title}" created with 20 recommended tracks!`)
+            listPlaylists() // refresh sidebar
+        }
+        else {
+            alert(`Error: ${data.error || data.message}`)
+        }
+    })
+    .catch(err => {
+        console.error("Failed to create playlist from recommendations:", err)
+        alert("Something went wrong.")
+    })
+}
+
 // fetch and render playlists for current user
 async function listPlaylists(){
     const res = await fetch("/api/playlists")
