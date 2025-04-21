@@ -73,7 +73,7 @@ async function requireAdmin(req, res, next){
     })
 }
 
-// API testing (for class)
+// API testing (for CS3110 class)
 const dancers = []
 
 app.get('/api', (req, res) => {
@@ -732,7 +732,7 @@ app.delete('/api/playlists/:playlistID/tracks/:trackID', isAuthenticated, (req, 
 app.post('/api/me/recommendations', (req, res) => {
 	const userID = req.session.spotifyID
 	let { title } = req.body
-	const numResults = 20
+	const numResults = 50
 	const image_base64 = process.env.SAMPLE_B64_IMAGE
 
 	if(!title){
