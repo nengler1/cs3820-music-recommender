@@ -20,8 +20,33 @@ def recreate_recommendation_tables(db_connection):
     db_connection.commit()
 
 
+def rename_column_in_saved_tracks(db_connection):
+    """Rename user_id to spotify_id in the Saved_Tracks table."""
+    print("Renaming user_id to spotify_id in the Saved_Tracks table...")
+
+    # SQLite workaround for renaming a column
+    cursor = db_connection.cursor()
+
+    # Create a new table with the correct column name
+    cursor.execute("""
+        CREATE TABLE Saved_Tracks_new AS
+        SELECT track_id, user_id AS spotify_id
+        FROM Saved_Tracks
+    """)
+
+    # Drop the old table
+    cursor.execute("DROP TABLE Saved_Tracks")
+
+    # Rename the new table to the original name
+    cursor.execute("ALTER TABLE Saved_Tracks_new RENAME TO Saved_Tracks")
+
+    db_connection.commit()
+
+    print("Renaming complete.")
+
 db_path = "jsapp/sqlite3.db"
 db_connection = sqlite3.connect(db_path)
 delete_recommendations_tables(db_connection)
 recreate_recommendation_tables(db_connection)
+rename_column_in_saved_tracks(db_connection)
 db_connection.close()

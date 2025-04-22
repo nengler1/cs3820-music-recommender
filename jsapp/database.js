@@ -133,7 +133,6 @@ db.serialize(() => {
     db.run(`ALTER TABLE Track
         ADD COLUMN artist_id VARCHAR(255)
     ;`)
-    db.run(`DROP TABLE Tracks_for_Playlists`)
     */
    
 })

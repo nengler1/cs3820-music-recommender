@@ -484,7 +484,7 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 		`)
 
 		const user_track_link = db.prepare(`
-			INSERT OR IGNORE INTO Saved_Tracks (user_id, track_id)
+			INSERT OR IGNORE INTO Saved_Tracks (track_id, spotify_id)
 			VALUES (?, ?)
 		`)
 
@@ -515,8 +515,8 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 			])
 
 			user_track_link.run([
-				userID,
 				track.spotify_id,
+				userID,
 			])
 		})
 
