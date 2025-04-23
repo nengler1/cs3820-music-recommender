@@ -19,13 +19,12 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `create_playlist.html`: Interface for users to create and manage playlists.
 - `favicon.ico`: Website icon for browser tabs.
 - `fetchapi.js`: Manages more advanced or specific API requests.
-- `hw.html`:
+- `hw.html`: (CS3110)
 - `index.html`: Main landing page for the application.
 - `index_one.html`: An alternate or prototype version of the main page.
 - `melofy-logo.png`: Logo used on the live melofy site.
-- `playlist_icon.png`, `recommend_icon.png`,: Icons for feature representation.
+- `playlist_icon.png`, `recommend_icon.png`, `recommended_icon.png`: Icons for feature representation.
 - `profile.html`: User profile page displaying personal information and preferences.
-- `recommended_icon.png`:
 - `spotify_icon.png`: Spotify icon if you choose to use the Spotify API.
 - `styles.css`: Main stylesheet for the application.
 - `willow.jpg`: Nathan's cat.
@@ -37,14 +36,13 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `3_Merge.py`: Averages the Collaborative Filtering and Content-based Filtering calculations and stores them in the Merged_Recommendations table.
 - `4_Results.py`: Prints a user-selected length list of the top recommendations for eah user in terms of database.
 - `5_Metrics.py`: Takes the results from the Merged_Recommendations table and performs a top-K / bottom-K analysis of the accuracy, precision, recall, and F1.
-- `app.js`:
-- `data_csv_asynchronous.js`:
+- `app.js`: Complete API Backend querying the Spotify API for user's songs. `/api/me/saved-tracks`, `/api/me/recommendations`, and `/api/playlists/:id/export` are the main endpoints for this project.
+- `data_csv_asynchronous.js`: Incorporating the audio features database from a python script instead of in synchronous with a user's login
 - `database.js`: Builds the initial database and all the tables.
 - `db_diagram.py`: A script to create an Entity Relational Diagram (ERD) of the database.
-- `package-lock.json`:
-- `package.json`:
+- `package-lock.json`, `package.json`: NPM libraries
 - `requirements.txt`: A list for installing Python dependencies (see "Dependencies" below)
-- `users.js`:
+- `users.js`: (CS3110)
 #### DATA
 - `data.zip`: data used to impute missing track features.
 - `data_by_artist.csv`: data used to impute missing track features by artist, when the track is not available.
