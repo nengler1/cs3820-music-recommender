@@ -1,4 +1,4 @@
-# 🎵 Music Recommender 🎵 
+# Spotify Music Recommender
 
 The Music Recommender was developed by Nathan Engler and Robert Kroleski as a semester project for CS3820: Introduction to Artificial Intelligence at the University of Colrado at Colorado Springs.
 This Github represents the culmination of their work and is provided as an Open Source project for anyone seeking to experiment with recommender systems or expand its current capabilities.
@@ -8,24 +8,26 @@ From the recommendations, users can produce and manage Spotify playlists.
 Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 ---
 
+## Dataset Restriction
+
+Due to our research involving human subjects, according to the Institutional Review Board (IRB) at UCCS, we do not have permission to publish human subject data. We are actively applying our project for permission.
+
+To use our project, you must create a database with your preferred users.
+
 ## Project Structure
 
 ### .VSCODE
 - `settings.json`: Stores our settings for this app.
   
 ### HTML
-- `admin.html`: Administrative interface for managing backend functionalities.
-- `basicapi.js`: Handles basic API interactions related to Admin and Users, and data fetching.
 - `create_playlist.html`: Interface for users to create and manage playlists.
 - `favicon.ico`: Website icon for browser tabs.
 - `fetchapi.js`: Manages more advanced or specific API requests.
-- `hw.html`:
 - `index.html`: Main landing page for the application.
-- `index_one.html`: An alternate or prototype version of the main page.
+- `index_one.html`: API Endpoint Testing
 - `melofy-logo.png`: Logo used on the live melofy site.
-- `playlist_icon.png`, `recommend_icon.png`,: Icons for feature representation.
+- `playlist_icon.png`, `recommend_icon.png`, `recommended_icon.png`: Icons for feature representation.
 - `profile.html`: User profile page displaying personal information and preferences.
-- `recommended_icon.png`:
 - `spotify_icon.png`: Spotify icon if you choose to use the Spotify API.
 - `styles.css`: Main stylesheet for the application.
 - `willow.jpg`: Nathan's cat.
@@ -37,24 +39,16 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `3_Merge.py`: Averages the Collaborative Filtering and Content-based Filtering calculations and stores them in the Merged_Recommendations table.
 - `4_Results.py`: Prints a user-selected length list of the top recommendations for eah user in terms of database.
 - `5_Metrics.py`: Takes the results from the Merged_Recommendations table and performs a top-K / bottom-K analysis of the accuracy, precision, recall, and F1.
-- `app.js`:
-- `data_csv_asynchronous.js`:
+- `app.js`: Complete API Backend querying the Spotify API for user's songs. `/api/me/saved-tracks`, `/api/me/recommendations`, and `/api/playlists/:id/export` are the main endpoints for this project.
+- `data_csv_asynchronous.js`: Incorporating the audio features database from a python script instead of in synchronous with a user's login
 - `database.js`: Builds the initial database and all the tables.
 - `db_diagram.py`: A script to create an Entity Relational Diagram (ERD) of the database.
-- `package-lock.json`:
-- `package.json`:
+- `package-lock.json`, `package.json`: NPM libraries
 - `requirements.txt`: A list for installing Python dependencies (see "Dependencies" below)
-- `users.js`:
+  
 #### DATA
 - `data.zip`: data used to impute missing track features.
-- `data_by_artist.csv`: data used to impute missing track features by artist, when the track is not available.
-#### NODE_MODULES
-- (Various): Various JavaScript node modules used by the app.
-
-
-
-
-
+  - `data_by_artist.csv` and `mr_track_features` are the depracated audio features 
 
 ---
 
@@ -69,11 +63,36 @@ To run the frontend locally:
    cd cs3820-music-recommender/html
    ```
 
-2. **Open the Application**
+2. **Install Node.js and Libraries**
 
-   Simply open `index.html` in your preferred web browser.
+   Our `app.js` runs off of Node.js for our backend JavaScript API calls for Spotify.
+   To correctly run the app, first make sure you have `npm` package manager for Node.js installed (visit https://nodejs.org/en/download for more information).
+   Install the packages `http-server` and `nodemon` globally with this command.
+   ```bash
+   npm install -g nodemon http-server
+   ```
+   Navigate to the `jsapp/` folder and install the dependency packages needed to run `app.js`.
+   ```bash
+   cd jsapp
+   npm install
+   ```
+3. **Run Environment**
+   While in the `jsapp/` folder, run our `app.js` with `nodemon` (you can use `node` as well)
+   ```bash
+   nodemon app.js
+   ```
+   
+   In another terminal window, navigate to the `html/` folder and start a local `http-server`.
+   ```bash
+   cd html
+   http-server -P http://localhost:3000
+   ```
+   All our API endpoints run through port 3000.
+   
+5. **Open the Application**
 
-> **Note:** Backend services should be running locally or remotely to provide the required API endpoints for full functionality.
+   Simply direct to `http://127.0.0.1:8080/` or `http://localhost:8080/` in your preferred web browser.
+   If you see "Log in", that means it is running correctly!
 
 ---
 
@@ -91,26 +110,42 @@ To run the frontend locally:
 - **HTML5 & CSS3**: For webpage structure and styling.
 - **JavaScript (ES6)**: For interactivity and API integration.
 - **RESTful APIs**: Backend communication for data retrieval and actions.
+- **Python 3.13.3**: For AI Models and Results
 
 ---
 
 ## Dependencies
 
-- **eralchemy==1.5.0**
-- **greenlet==3.2.0**
-- **joblib==1.4.2**
-- **numpy==2.2.4**
-- **pandas==2.2.3**
-- **pygraphviz==1.14**
-- **python-dateutil==2.9.0.post0**
-- **pytz==2025.2**
-- **scikit-learn==1.6.1**
-- **scipy==1.15.2**
-- **six==1.17.0**
-- **SQLAlchemy==2.0.40**
-- **threadpoolctl==3.6.0**
-- **typing_extensions==4.13.2**
-- **tzdata==2025.2**
+- Python
+  - **eralchemy==1.5.0**
+  - **greenlet==3.2.0**
+  - **joblib==1.4.2**
+  - **numpy==2.2.4**
+  - **pandas==2.2.3**
+  - **pygraphviz==1.14**
+  - **python-dateutil==2.9.0.post0**
+  - **pytz==2025.2**
+  - **scikit-learn==1.6.1**
+  - **scipy==1.15.2**
+  - **six==1.17.0**
+  - **SQLAlchemy==2.0.40**
+  - **threadpoolctl==3.6.0**
+  - **typing_extensions==4.13.2**
+  - **tzdata==2025.2**
+
+- **JavaScript**
+  - **"basic-auth": "^2.0.1",**
+  - **"bcrypt": "^5.1.1",**
+  - **"better-sqlite3": "^11.9.0",**
+  - **"browser-image-compression": "^2.0.2",**
+  - **"csv-parser": "^3.2.0",**
+  - **"dotenv": "^16.4.7",**
+  - **"express": "^4.21.2",**
+  - **"express-session": "^1.18.1",**
+  - **"multer": "^1.4.5-lts.2",**
+  - **"spotify-web-api-node": "^5.0.2",**
+  - **"sqlite3": "^5.1.7",**
+  - **"uuid": "^11.1.0"**
 
 ---
 
@@ -140,6 +175,7 @@ We welcome contributions from the community! To contribute:
 5. Open a Pull Request for review.
 
 ---
+
 
 ## License
 
