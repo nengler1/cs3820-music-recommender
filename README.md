@@ -38,7 +38,13 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `4_Results.py`: Prints a user-selected length list of the top recommendations for eah user in terms of database.
 - `5_Metrics.py`: Takes the results from the Merged_Recommendations table and performs a top-K / bottom-K analysis of the accuracy, precision, recall, and F1.
 - `app.js`:
-- `app.js`:
+- `data_csv_asynchronous.js`:
+- `database.js`: Builds the initial database and all the tables.
+- `db_diagram.py`: A script to create an Entity Relational Diagram (ERD) of the database.
+- `package-lock.json`:
+- `package.json`:
+- `requirements.txt`: A list for installing Python dependencies (see "Dependencies" below)
+- `users.js`:
 #### DATA
 - `data.zip`: data used to impute missing track features.
 - `data_by_artist.csv`: data used to impute missing track features by artist, when the track is not available.
