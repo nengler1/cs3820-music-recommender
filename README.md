@@ -67,11 +67,36 @@ To run the frontend locally:
    cd cs3820-music-recommender/html
    ```
 
-2. **Open the Application**
+2. **Install Node.js and Libraries**
 
-   Simply open `index.html` in your preferred web browser.
+   Our `app.js` runs off of Node.js for our backend JavaScript API calls for Spotify.
+   To correctly run the app, first make sure you have `npm` package manager for Node.js installed (visit https://nodejs.org/en/download for more information).
+   Install the packages `http-server` and `nodemon` globally with this command.
+   ```bash
+   npm install -g nodemon http-server
+   ```
+   Navigate to the `jsapp/` folder and install the dependency packages needed to run `app.js`.
+   ```bash
+   cd jsapp
+   npm install
+   ```
+3. **Run Environment**
+   While in the `jsapp/` folder, run our `app.js` with `nodemon` (you can use `node` as well)
+   ```bash
+   nodemon app.js
+   ```
+   
+   In another terminal window, navigate to the `html/` folder and start a local `http-server`.
+   ```bash
+   cd html
+   http-server -P http://localhost:3000
+   ```
+   All our API endpoints run through port 3000.
+   
+5. **Open the Application**
 
-> **Note:** Backend services should be running locally or remotely to provide the required API endpoints for full functionality.
+   Simply direct to `http://127.0.0.1:8080/` or `http://localhost:8080/` in your preferred web browser.
+   If you see "Log in", that means it is running correctly!
 
 ---
 
