@@ -96,19 +96,19 @@ We welcome contributions from the community! To contribute:
 2. Create a new branch:
 
    ```bash
-   git checkout -b feature/YourFeatureName
+   git checkout -b branch/your-new-branch
    ```
 
 3. Make your changes and commit them:
 
    ```bash
-   git commit -m "Add Your Feature"
+   git commit -m "Add Your Branch"
    ```
 
 4. Push to your fork:
 
    ```bash
-   git push origin feature/YourFeatureName
+   git push origin branch/your-new-branch
    ```
 
 5. Open a Pull Request for review.
