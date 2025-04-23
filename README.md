@@ -19,7 +19,7 @@ It offers users an interactive platform to retrieve music data and receive perso
 - `index_one.html`: An alternate or prototype version of the main page.
 
 ### JavaScript Files
-- `basicapi.js`: Handles basic API interactions and data fetching.
+- `basicapi.js`: Handles basic API interactions related to Admin and Users, and data fetching.
 - `fetchapi.js`: Manages more advanced or specific API requests.
 
 ### Styles and Assets
