@@ -1,8 +1,5 @@
 Find the updated website here: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-https://github.com/nengler1/cs3820-music-recommender/blob/main/LICENSE
-
 # 🎵 CS3820 Music Recommender – Frontend
 
 This directory houses the frontend interface for the CS3820 Music Recommender project.  
