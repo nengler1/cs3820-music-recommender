@@ -3,8 +3,8 @@ Find the updated website here: [melofy.apps.dj](https://melofy.apps.dj/spotify.h
 # 🎵 Music Recommender 🎵 
 
 The Music Recommender was developed by Nathan Engler and Robert Kroleski as a semester project for CS3820: Introduction to Artificial Intelligence at the University of Colrado at Colorado Springs.
-This Github represents the culmination of their work and is provided as an Open Source project for anyone seeking to expand on its current capabilities.
-It offers users an interactive platform to receive personalized music recommendations, manage playlists, and engage with various features designed to enhance their musical experience.
+This Github represents the culmination of their work and is provided as an Open Source project for anyone seeking to experiment with recommender systems or expand on its current capabilities.
+It offers users an interactive platform to receive personalized music recommendations from an ensemble of collaborative filtering and content-based filtering, and manage playlists.
 
 ---
 
