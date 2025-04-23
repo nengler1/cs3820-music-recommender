@@ -1,6 +1,6 @@
 Find the updated website here: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 
-# 🎵 CS3820 Music Recommender – Frontend
+# 🎵 CS3820 Music Recommender 🎵 
 
 This directory houses the frontend interface for the CS3820 Music Recommender project.  
 It offers users an interactive platform to receive personalized music recommendations, manage playlists, and engage with various features designed to enhance their musical experience.
