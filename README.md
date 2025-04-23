@@ -5,14 +5,14 @@ This Github represents the culmination of their work and is provided as an Open 
 It offers users an interactive platform to retrieve user and music data and generate personalized music recommendations from an ensemble of collaborative filtering and content-based filtering approaches.
 From the recommendations, users can produce and manage Spotify playlists.
 
-Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
+Find our website: [melofy.apps.dj](https://melofy.apps.dj/)
 ---
 
 ## Dataset Restriction
 
-Due to our research involving human subjects, according to the Institutional Review Board (IRB) at UCCS, we do not have permission to publish human subject data. We are actively applying our project for permission.
+Due to our research involving human subjects, [according to the Institutional Review Board (IRB) at UCCS](https://osp.uccs.edu/research-compliance/research-involving-human-subject-irb), we do not have permission to publish human subject data. We are actively applying our project for permission.
 
-To use our project, you must create a database with your preferred users.
+To use our project, you must create a database with your preferred users. Our database is not linked on the repository.
 
 ## Project Structure
 
@@ -43,12 +43,12 @@ To use our project, you must create a database with your preferred users.
 - `data_csv_asynchronous.js`: Incorporating the audio features database from a python script instead of in synchronous with a user's login
 - `database.js`: Builds the initial database and all the tables.
 - `db_diagram.py`: A script to create an Entity Relational Diagram (ERD) of the database.
-- `package-lock.json`, `package.json`: NPM libraries
+- `package-lock.json`, `package.json`: a list of Node.js dependencies
 - `requirements.txt`: A list for installing Python dependencies (see "Dependencies" below)
   
 #### DATA
 - `data.zip`: data used to impute missing track features.
-  - `data_by_artist.csv` and `mr_track_features` are the depracated audio features 
+  - `data_by_artist.csv` and `mr_track_features.csv` are the depracated audio features 
 
 ---
 
@@ -63,7 +63,19 @@ To run the frontend locally:
    cd cs3820-music-recommender/html
    ```
 
-2. **Install Node.js and Libraries**
+2. **Add your own Spotify API App**
+
+   Log in to your Spotify account on your browser, and navigate to https://developer.spotify.com/dashboard to create your own app. Set an app name, description, and set your "Redirect URI" to `http://127.0.0.1:8080/api/callback` (note this down), as well as select the Web API, as that is what we are planning on using.
+   Once created, copy down your `Client ID` and `Client Secret`.
+   With this information, create an Environment file `.env` inside the `jsapp/` folder. Add your Client ID, Client Secret, and your Redirect URI (as well as a session secret for Express in `app.js` which could be any string you would like.
+   ```properties
+     CLIENT_ID = "[client_id]"
+     CLIENT_SECRET = "[client_secret]"
+     REDIRECT_URI = "http://127.0.0.1:8080/api/callback"
+     SESSION_SECRET = "<any string you would like>"
+   ```
+   
+3. **Install Node.js and Libraries**
 
    Our `app.js` runs off of Node.js for our backend JavaScript API calls for Spotify.
    To correctly run the app, first make sure you have `npm` package manager for Node.js installed (visit https://nodejs.org/en/download for more information).
@@ -76,7 +88,7 @@ To run the frontend locally:
    cd jsapp
    npm install
    ```
-3. **Run Environment**
+4. **Run Environment**
    While in the `jsapp/` folder, run our `app.js` with `nodemon` (you can use `node` as well)
    ```bash
    nodemon app.js
