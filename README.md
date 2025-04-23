@@ -31,7 +31,7 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `willow.jpg`: Nathan's cat.
 
 ### JSAPP
-- `0_prep.py`: Wipes the relevant recommendation tables from the database and then recreates them.
+- `0_prep.py`: Deletes the relevant recommendation tables from the database and then recreates them.
 - `1_CF.py`: Performs the Collaborative Filtering calculations of the recommendation system and stores them in the Collaborative_Recommendations table.
 - `2_CBF.py`: Performs the Content-based Filtering calculations of the recommendation system and stores them in the Content_Recommendations table.
 - `3_Merge.py`: Averages the Collaborative Filtering and Content-based Filtering calculations and stores them in the Merged_Recommendations table.
