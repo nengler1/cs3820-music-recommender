@@ -1,7 +1,6 @@
 Find the updated website here: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 
-<a href = https://github.com/nengler1/cs3820-music-recommender/blob/main/LICENSE">![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)</a>
-
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg): https://github.com/nengler1/cs3820-music-recommender/blob/main/LICENSE
 
 readme_content = """
 # 🎵 CS3820 Music Recommender – Frontend
