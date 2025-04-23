@@ -42,7 +42,7 @@ def list_recommendations(conn, num_results):
 db_path = "jsapp/sqlite3.db"
 recs_per_user = 50
 conn = sqlite3.connect(db_path)
-num_results = 20
+num_results = 50
 
 display_top_recommendations(conn)
 list_recommendations(conn, num_results)

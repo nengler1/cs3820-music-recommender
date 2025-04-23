@@ -48,5 +48,5 @@ db_path = "jsapp/sqlite3.db"
 db_connection = sqlite3.connect(db_path)
 delete_recommendations_tables(db_connection)
 recreate_recommendation_tables(db_connection)
-rename_column_in_saved_tracks(db_connection)
+#rename_column_in_saved_tracks(db_connection)
 db_connection.close()

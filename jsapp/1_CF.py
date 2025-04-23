@@ -8,6 +8,11 @@ from collections import defaultdict
 def load_user_track_data(db_connection):
     user_ids = pd.read_sql_query("SELECT id, spotify_id FROM Users", db_connection) # Get User's id and Spotify id
     saved_tracks = pd.read_sql_query("SELECT spotify_id, track_id FROM Saved_Tracks", db_connection)
+
+    for ids in saved_tracks['spotify_id']:  # issues with spotify IDs being integers
+        if type(ids) == int:
+            saved_tracks['spotify_id'] = saved_tracks['spotify_id'].replace({ids: str(ids)})
+    
     saved_tracks_by_userid = pd.merge(saved_tracks, user_ids, on='spotify_id', how = 'inner')
     user_saved_tracks_dict = saved_tracks_by_userid.groupby("id")["track_id"].apply(set).to_dict()
     saved_tracks_by_userid['user_id'] = saved_tracks_by_userid['id']

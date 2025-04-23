@@ -52,7 +52,6 @@ function csvToMap(filePath, keyField, map, normalize) {
 }
 
 // Admin Features
-const { authenticate, hashPassword } = require('./users') // hashing passwords in users.js
 
 async function requireAuth(req, res, next){
 	const user = await authenticate(req.headers.authorization)
@@ -73,7 +72,7 @@ async function requireAdmin(req, res, next){
     })
 }
 
-// API testing (for CS3110 class)
+// API testing
 const dancers = []
 
 app.get('/api', (req, res) => {
@@ -218,24 +217,6 @@ app.get('/api/login', (req, res) => {
 	res.redirect(spotifyAPI.createAuthorizeURL(scopes, null, true))
 })
 
-/*
-app.post('/api/login', async (req, res) => {
-    const { spotifyId, name } = req.body;
-
-    db.run(`INSERT INTO users (spotify_id, name) VALUES (?, ?) 
-            ON CONFLICT(spotify_id) DO UPDATE SET name = excluded.name`, 
-        [spotifyId, name], 
-        function(err){
-            if(err){
-                return res.status(500).json({ error: "Database error" })
-            }
-
-            req.session.spotifyId = spotifyId;
-            res.json({ message: "User logged in", spotifyId })
-        }
-    )
-})
-*/
 
 app.get('/api/callback', async (req, res) => {
 	console.log("REDIRECTED")
