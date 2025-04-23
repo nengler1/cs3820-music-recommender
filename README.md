@@ -8,7 +8,7 @@ From the recommendations, users can produce and manage Spotify playlists.
 Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ### .VSCODE
 - `settings.json`: Stores our settings for this app.
@@ -58,7 +58,7 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 To run the frontend locally:
 
@@ -77,7 +77,7 @@ To run the frontend locally:
 
 ---
 
-## 🛠 Features
+## Features
 
 - **Personalized Recommendations**: Receive music suggestions tailored to your preferences.
 - **Playlist Management**: Create, edit, and manage playlists easily.
@@ -86,7 +86,7 @@ To run the frontend locally:
 
 ---
 
-## 📚 Technologies Used
+## Technologies Used
 
 - **HTML5 & CSS3**: For webpage structure and styling.
 - **JavaScript (ES6)**: For interactivity and API integration.
@@ -94,7 +94,7 @@ To run the frontend locally:
 
 ---
 
-## 📚 Dependencies
+## Dependencies
 
 - **eralchemy==1.5.0**
 - **greenlet==3.2.0**
@@ -114,7 +114,7 @@ To run the frontend locally:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! To contribute:
 
@@ -141,7 +141,7 @@ We welcome contributions from the community! To contribute:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.  
 See the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/nengler1/cs3820-music-recommender/blob/main/LICENSE) file for full details.
