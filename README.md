@@ -1,8 +1,9 @@
 Find the updated website here: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 
-# 🎵 CS3820 Music Recommender 🎵 
+# 🎵 Music Recommender 🎵 
 
-This directory houses the frontend interface for the CS3820 Music Recommender project.  
+This Music Recommender project was developed as a semester project for UCCS CS3820 (Introduction to Artificial Intelligence) by Nathan Engler and Robert Kroleski.
+This Github represents the culmination of their work and is provided as an Open Source project for anyone seeking to expand on its current capabilities.
 It offers users an interactive platform to receive personalized music recommendations, manage playlists, and engage with various features designed to enhance their musical experience.
 
 ---
