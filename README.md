@@ -2,13 +2,16 @@
 
 The Music Recommender was developed by Nathan Engler and Robert Kroleski as a semester project for CS3820: Introduction to Artificial Intelligence at the University of Colrado at Colorado Springs.
 This Github represents the culmination of their work and is provided as an Open Source project for anyone seeking to experiment with recommender systems or expand its current capabilities.
-It offers users an interactive platform to retrieve music data and receive personalized music recommendations from an ensemble of collaborative filtering and content-based filtering, and produce and manage playlists.
+It offers users an interactive platform to retrieve music data and receive personalized music recommendations from an ensemble of collaborative filtering and content-based filtering models, and produce and manage playlists.
 
 Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 ---
 
 ## 📁 Project Structure
 
+### .VSCODE
+- `settings.json`: Stores our settings for this app.
+  
 ### HTML
 - `admin.html`: Administrative interface for managing backend functionalities.
 - `basicapi.js`: Handles basic API interactions related to Admin and Users, and data fetching.
@@ -17,21 +20,23 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `fetchapi.js`: Manages more advanced or specific API requests.
 - `hw.html`:
 - `index.html`: Main landing page for the application.
+- `index_one.html`: An alternate or prototype version of the main page.
 - `melofy-logo.png`: Logo used on the live melofy site.
 - `playlist_icon.png`, `recommend_icon.png`,: Icons for feature representation.
 - `profile.html`: User profile page displaying personal information and preferences.
-
-- `index_one.html`: An alternate or prototype version of the main page.
-
-
-
-### Styles and Assets
-- `styles.css`: Main stylesheet for the application.
-
-
-
+- `recommended_icon.png`:
 - `spotify_icon.png`: Spotify icon if you choose to use the Spotify API
+- `styles.css`: Main stylesheet for the application.
 - `willow.jpg`: Nathan's cat.
+
+### JASPP
+- `data.zip`: data used to impute missing track features
+- `data_by_artist.csv`: data used to impute missing track features by artist, when the track is not available
+- 
+
+
+
+
 
 ---
 
