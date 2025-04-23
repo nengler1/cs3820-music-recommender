@@ -99,7 +99,7 @@ We welcome contributions from the community! To contribute:
 ## 📄 License
 
 This project is licensed under the MIT License.  
-See the ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)file for full details.
+See the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/nengler1/cs3820-music-recommender/blob/main/LICENSE) file for full details.
 
 ---
 
