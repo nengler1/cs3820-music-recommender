@@ -2,7 +2,7 @@ Find the updated website here: [melofy.apps.dj](https://melofy.apps.dj/spotify.h
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-# Define the content of the README.md file
+
 readme_content = """
 # 🎵 CS3820 Music Recommender – Frontend
 
