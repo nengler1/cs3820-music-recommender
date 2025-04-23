@@ -30,13 +30,15 @@ Find our website: [melofy.apps.dj](https://melofy.apps.dj/spotify.html)
 - `styles.css`: Main stylesheet for the application.
 - `willow.jpg`: Nathan's cat.
 
-### JASPP
+### JSAPP
 - `0_prep.py`: Wipes the relevant recommendation tables from the database and then recreates them.
 - `1_CF.py`: Performs the Collaborative Filtering calculations of the recommendation system and stores them in the Collaborative_Recommendations table.
 - `2_CBF.py`: Performs the Content-based Filtering calculations of the recommendation system and stores them in the Content_Recommendations table.
 - `3_Merge.py`: Averages the Collaborative Filtering and Content-based Filtering calculations and stores them in the Merged_Recommendations table.
 - `4_Results.py`: Prints a user-selected length list of the top recommendations for eah user in terms of database.
 - `5_Metrics.py`: Takes the results from the Merged_Recommendations table and performs a top-K / bottom-K analysis of the accuracy, precision, recall, and F1.
+- `app.js`:
+- `app.js`:
 #### DATA
 - `data.zip`: data used to impute missing track features.
 - `data_by_artist.csv`: data used to impute missing track features by artist, when the track is not available.
