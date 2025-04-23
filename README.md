@@ -27,7 +27,7 @@ It offers users an interactive platform to retrieve music data and receive perso
 - `favicon.ico`: Website icon for browser tabs.
 - `melofy-logo.png`: Logo used in the site branding.
 - `playlist_icon.png`, `recommend_icon.png`,: Icons for feature representation.
-- `spotify_icon.png`: Spotify icon for displaying, if you choose to interact with the Spotify API
+- `spotify_icon.png`: Spotify icon if you choose to use the Spotify API
 - `willow.jpg`: Nathan's cat.
 
 ---
