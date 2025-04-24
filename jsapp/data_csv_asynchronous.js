@@ -12,11 +12,14 @@ function normalizeName(name) {
     return name?.toLowerCase().replace(/[\s\W]+/g, '')
   }
 
+// loading the csvs to a Map 
 function csvToMap(file_path, key_field, map, normalize = false, callback){
     fs.createReadStream(file_path)
         .pipe(csv())
         .on("data", row => {
             const rawKey = row[key_field]
+
+            // if the artist dataset is being used, get the normalized artist name (no artist ID)
             const key = normalize ? normalizeName(rawKey) : rawKey
             map.set(key, row)
         })
@@ -26,6 +29,7 @@ function csvToMap(file_path, key_field, map, normalize = false, callback){
         })
 }
 
+// filling the missing features in the database for each song
 function fillAudioFeatures(){
     db.serialize(() => {
         db.all(`
@@ -55,10 +59,12 @@ function fillAudioFeatures(){
           
             let update_count = 0
             for (const track of rows) {
+              // if there is track data, use track features
               const track_data = track_features.get(track.spotify_id)
               let values = track_data
               let source = 'track'
-          
+
+              // if no track data for that song, query for the artist instead
               if (!track_data) {
                 const norm_artist_name = normalizeName(track.artist_name)
                 const artist_data = artist_features.get(norm_artist_name)
@@ -72,12 +78,14 @@ function fillAudioFeatures(){
                 source = 'artist'
               }
 
+              
               const key_name = (values.key || '').trim()
               const mode_name = (values.mode || '').trim()
 
               const key_number = KEY_NAME_TO_PITCH_CLASS[key_name] ?? -1
               const mode_binary = MODE_NAME_TO_BINARY[mode_name] ?? null
-          
+
+              // if there isn't any features, set to the respective null value
               update_tracks.run([
                 parseFloat(values.acousticness) || parseFloat(values.Acousticness) || null,
                 parseFloat(values.danceability) || null,
@@ -108,6 +116,7 @@ function fillAudioFeatures(){
     })
 }
 
+// loading the datasets
 csvToMap('data\\mr_tracks_dataset.csv', 'id', track_features, false, () => {
     csvToMap('data\\data_by_artist.csv', 'artists', artist_features, true, () => {
         fillAudioFeatures()
