@@ -29,18 +29,21 @@ app.use(express.json())
 const fs = require('fs')
 const csv = require('csv-parser')
 
-const track_features = new Map();
-const artist_features = new Map();
+const track_features = new Map()
+const artist_features = new Map()
 
 function normalizeName(name) {
-  return name?.toLowerCase().replace(/[\s\W]+/g, '');
+  return name?.toLowerCase().replace(/[\s\W]+/g, '')
 }
 
+// loading the csvs to the respective Map 
 function csvToMap(filePath, keyField, map, normalize) {
   return new Promise((resolve) => {
     fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', row => {
+
+		// if the artist dataset is being used, get the normalized artist name (no artist ID)
         const key = normalize ? normalizeName(row[keyField]) : row[keyField]
         map.set(key, row)
       })
@@ -197,12 +200,14 @@ app.get('/api/me', requireAuth, (req, res) => {
 
 // -- SPOTIFY INTEGRATION --
 
+// creating a new instance of Spotify API with setting from the Web API App Dashboard
 const spotifyAPI = new SpotifyWebAPI({
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     redirectUri: process.env.REDIRECT_URI
 })
 
+// once a user logs in, we defint he scopes and show them what they are accepting to
 app.get('/api/login', (req, res) => {
 	const scopes = [
 		'user-read-private',
@@ -217,7 +222,7 @@ app.get('/api/login', (req, res) => {
 	res.redirect(spotifyAPI.createAuthorizeURL(scopes, null, true))
 })
 
-
+// redirecting user back to page; getting accessToken for them
 app.get('/api/callback', async (req, res) => {
 	console.log("REDIRECTED")
 	const error = req.query.error
@@ -240,6 +245,7 @@ app.get('/api/callback', async (req, res) => {
 		req.session.accessToken = accessToken
 		req.session.refreshToken = refreshToken
 
+		// for profile aspects
 		const profile = await fetchWebApi('v1/me', accessToken)
 		const spotifyID = profile.id
 		const name = profile.display_name
@@ -255,6 +261,7 @@ app.get('/api/callback', async (req, res) => {
 			}
 		)
 
+		// storing the user's spotify ID in the session
 		req.session.spotifyID = spotifyID
 		res.redirect('/')
 	} catch(error){
@@ -263,6 +270,7 @@ app.get('/api/callback', async (req, res) => {
 	}
 })
 
+// users are only allowed to access the endpoint if they are authenticated
 const isAuthenticated = (req, res, next) => {
     if(req.session.spotifyID){
         return next()
@@ -270,7 +278,7 @@ const isAuthenticated = (req, res, next) => {
     return res.status(401).json({error: "You must be logged in to access this."})
 }
 
-
+// seeing if the user is logged in or not
 app.get('/api/me/status', (req, res) => {
 	if(req.session.accessToken){
 		res.json({loggedIn: true})
@@ -279,6 +287,7 @@ app.get('/api/me/status', (req, res) => {
 	}
 })
 
+// function to quickly use the Spotify API endpoints
 async function fetchWebApi(endpoint, accessToken){
 	try {
 		const response = await fetch(`https://api.spotify.com/${endpoint}`, {
@@ -291,7 +300,7 @@ async function fetchWebApi(endpoint, accessToken){
 	}
 }
 
-
+// showcasing profile information
 app.get('/api/me/profile', isAuthenticated, async (req, res) => {
 	const accessToken = req.session.accessToken
 	if(!accessToken){
@@ -313,6 +322,7 @@ app.get('/api/me/profile', isAuthenticated, async (req, res) => {
 	res.json(details)
 })
 
+// searching through tracks and sending back results (top 10)
 app.get('/api/search-tracks/:track', isAuthenticated, async (req, res) => {
 	const accessToken = req.session.accessToken
 	if(!accessToken){
@@ -340,7 +350,7 @@ app.get('/api/search-tracks/:track', isAuthenticated, async (req, res) => {
 	res.json(tracks)
 })
 
-
+// getting top tracks (testing API)
 app.get('/api/me/top-tracks', async (req, res) => {
 	const {time_range} = req.query
 
@@ -375,7 +385,10 @@ app.get('/api/me/top-tracks', async (req, res) => {
 	}
 })
 
-// ENDPOINT FOR AI AND DATABASE
+// -- ENDPOINT FOR AI AND DATABASE --
+
+// endpoint to get the user's saved tracks
+ 
 app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 	const accessToken = req.session.accessToken
 	const userID = req.session.spotifyID
@@ -383,6 +396,8 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 		return res.status(401).json({message: 'Not logged in'})
 	}
 
+	// Spotify API allows up to 50 songs fetched per API call, therefore we created a delay to
+	// call the API until it gets all songs from user's liked songs
 	const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 	const all_tracks = []
@@ -391,11 +406,12 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 
 	try {
 		while(!finished){
-			// Spotify
+			// fetching the API calls with specific parameters
 			const sp_res = await fetch(`https://api.spotify.com/v1/me/tracks?limit=50&offset=${offset}`, {
 				headers: { Authorization: `Bearer ${accessToken}` }
 			  })
 			
+			// if we are sending too many calls at once, retry after the sent delay in seconds
 			if(sp_res.status === 429){
 				const retry = parseInt(sp_res.headers.get('Retry-After') || '1') * 1000
 				console.log(`Rate limited. Retrying in ${retry / 1000} seconds...`)
@@ -405,7 +421,7 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 
 			const data = await sp_res.json()
 
-			console.log(data)
+			console.log(data)	// printing the data to console to show for testing loading times
 
 			if (!data.items || data.items.length === 0){
 				break
@@ -417,11 +433,13 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 				const audio = track_features.get(track.id)
 				let fallback = null
 
+				// if fetching from the artist only dataset, normalize the name to get correct artist (no artist id)
 				if(!audio){
 					const norm_artist_name = normalizeName(track.artists[0].name)
 					fallback = artist_features.get(norm_artist_name)
 				}
 
+				// creating a JSON object containing the Spotify track data as well as audio features from dataset (pre-loaded on exec)
 				all_tracks.push({
 					spotify_id: track.id,
 					album_id: track.album.id,
@@ -453,6 +471,7 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 			await delay(5000) // 5 seconds
 		}
 
+		// adding the song data to the database
 		const saved_tracks_db = db.prepare(`
 			INSERT OR IGNORE INTO Track (
 			spotify_id, album_id, track_name, 
@@ -464,12 +483,13 @@ app.get('/api/me/saved-tracks', isAuthenticated, async (req, res) => {
 			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`)
 
+		// adding the linking table features to link the track ID to spotify ID
 		const user_track_link = db.prepare(`
 			INSERT OR IGNORE INTO Saved_Tracks (track_id, spotify_id)
 			VALUES (?, ?)
 		`)
 
-		// NEED ARTIST NAME AND ALBUM COVER URL !!!
+		// running the SQL to add song data to database
 		all_tracks.forEach(track => {
 			saved_tracks_db.run([
 				track.spotify_id,
@@ -710,16 +730,18 @@ app.delete('/api/playlists/:playlistID/tracks/:trackID', isAuthenticated, (req, 
     )
 })
 
+// endpoint to get the recommendations saved in database to a playlist
 app.post('/api/me/recommendations', (req, res) => {
 	const userID = req.session.spotifyID
 	let { title } = req.body
-	const numResults = 50
-	const image_base64 = process.env.SAMPLE_B64_IMAGE
+	const numResults = 50	// want 50 songs in the playlist
+	const image_base64 = process.env.SAMPLE_B64_IMAGE	// sending a sample image to spotify
 
 	if(!title){
 		title = "Melofy Recommended Playlist"
 	}
 
+	// SQL query to get the top 50 recommended tracks based on the spotify ID from the current session
 	const query = `
 		SELECT
             mr.user_id,
@@ -738,6 +760,7 @@ app.post('/api/me/recommendations', (req, res) => {
 		LIMIT ?
 	`
 
+	// running the SQL and returning any errors if arise
 	db.all(query, [userID, numResults], (err, tracks) => {
 		if(err){
 			console.error('Query error:', err.message)
@@ -748,7 +771,9 @@ app.post('/api/me/recommendations', (req, res) => {
 			return res.status(404).json({message: `No recommendations found for user.`})
 		}
 
-		const user_name = tracks[0].user_name
+		//const user_name = tracks[0].user_name
+
+		// JSON list of top songs in playlist
 		const reccomendations = tracks.map(track => ({
 			track_id: track.track_id,
 			track_name: track.track_name,
@@ -756,6 +781,7 @@ app.post('/api/me/recommendations', (req, res) => {
 			score: track.score
 		}))
 
+		// inserting each song into the playlist
 		db.run(`INSERT INTO Playlists (title, user_id, cover_image) VALUES (?, ?, ?)`,
 			[title, userID, image_base64],
 			function(err2){
@@ -764,6 +790,7 @@ app.post('/api/me/recommendations', (req, res) => {
 					return res.status(500).json({error: "Failed to create playlist."})
 				}
 
+				// assigning table id to playlist
 				const new_playlist_ID = this.lastID
 
 				const insert_track = db.prepare(`
@@ -848,6 +875,8 @@ app.post('/api/playlists/:id/export', isAuthenticated, async (req, res) => {
 				public: false
 			})
 		})
+
+		// creating spotify playlist to add tracks to
 		const created_playlist = await create_playlist_fetch.json()
 		if(!created_playlist.id){
 			return res.status(500).json({error: 'Could not create Spotify playlist'})
@@ -882,6 +911,7 @@ app.post('/api/playlists/:id/export', isAuthenticated, async (req, res) => {
 
 		const added_tracks = await add_tracks_fetch.json()
 
+		// exporting any errors sent
 		if(added_tracks.error){
 			return res.status(500).json({error: 'Failed to add tracks to Spotify playlist'})
 		}
@@ -889,6 +919,7 @@ app.post('/api/playlists/:id/export', isAuthenticated, async (req, res) => {
 	})
 })
 
+// pre-loading the datasets and running the app.
 Promise.all([
 	csvToMap('data/mr_tracks_dataset.csv', 'id', track_features, false),
 	csvToMap('data/data_by_artist.csv', 'artists', artist_features, true)
