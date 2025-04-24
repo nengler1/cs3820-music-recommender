@@ -14,6 +14,8 @@ Due to our research involving human subjects, [according to the Institutional Re
 
 To use our project, you must create a database with your preferred users. Our database is not linked on the repository.
 
+---
+
 ## Project Structure
 
 ### .VSCODE
@@ -114,6 +116,14 @@ To run the frontend locally:
 - **Playlist Management**: Create, edit, and manage playlists easily.
 - **User Profiles**: View and update your profile and preferences.
 - **Administrative Interface**: Access tools for managing data and users.
+
+---
+
+## Dataset(s) Used
+
+We used the datasets from this Kaggle page https://www.kaggle.com/code/dudewhat/spotify-eda.
+The datasets we used were `data_by_artists.csv` and `data.csv` (which was later renamed to `mr_track_features.csv`).
+You can also find these datasets in our repository under `/jsapp/data` in a zipped folder.
 
 ---
 
