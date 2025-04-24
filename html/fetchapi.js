@@ -190,6 +190,7 @@ async function createPlaylist(event){
     }
 }
 
+// creating the recommended playlist for the user
 async function createRecommendedPlaylist(event){
     event.preventDefault()
     const title = document.getElementById("title2").value.trim()
@@ -200,10 +201,10 @@ async function createRecommendedPlaylist(event){
         body: JSON.stringify({title: title})
     })
     .then(async res => {
-        const data = await res.json()
+        const data = await res.json()   // getting data from the recommendations endpoint (JSON)
         if(res.ok){
             console.log
-            alert(`Playlist "${data.title}" created with 20 recommended tracks!`)
+            alert(`Playlist "${data.title}" created with 50 recommended tracks!`)
             listPlaylists() // refresh sidebar
         }
         else {
