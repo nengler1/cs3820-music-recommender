@@ -5,6 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 def get_track_features(conn):
+    # Get the defined track features used in the CBF model
     query = f"""
         SELECT * FROM Track
         WHERE {" AND ".join(f"{col} IS NOT NULL" for col in features)}
@@ -15,10 +16,12 @@ def get_track_features(conn):
     return track_features_df
 
 def z_score_normalize(features):
+    # Use z-score normalization to standardize all the features to values between 0 and 1
     normalized_features = (features - features.mean()) / features.std()
     return normalized_features
 
 def get_user_profiles(conn, normalized_features):
+    # Get the saved tracks from each user and define a user's profile as the mean of all their saved tracks' normalized features
     query = "SELECT st.track_id, u.id AS user_id, st.spotify_id FROM Saved_Tracks st JOIN Users u ON st.spotify_id = u.spotify_id"
     saved_tracks = pd.read_sql_query(query, conn)
     saved_tracks['user_id'] = pd.to_numeric(saved_tracks['user_id'], errors='coerce')
@@ -32,6 +35,7 @@ def get_user_profiles(conn, normalized_features):
     return user_profiles
 
 def get_content_based_recommendations(user_profiles, normalized_features):
+    # Perform the CBF model calculations using cosine similarity between the user's profile and each track's normalized features
     for user_id, profile_vector in user_profiles.items():
         sims = cosine_similarity([profile_vector], normalized_features)[0]
         min_score = np.min(sims)
@@ -42,6 +46,7 @@ def get_content_based_recommendations(user_profiles, normalized_features):
                 score = 0.0
             else:
                 score = (sim - min_score) / (max_score - min_score) if max_score - min_score > 0 else 0.0
+            # Convert the results to the proper formats for the database
             user_id = int(user_id)  # Convert user_id to a standard Python int
             track_id = str(track_id)  # Ensure track_id is a string
             score = float(score)  # Ensure score is a float
@@ -53,13 +58,10 @@ def get_content_based_recommendations(user_profiles, normalized_features):
 db_path = "jsapp/sqlite3.db"
 features = ["acousticness", "danceability", "duration_ms", "energy", "instrumentalness", "key", "liveness", "loudness", "popularity", "speechiness", "tempo", "valence"]
 recs_per_user = 50000
-
 conn = sqlite3.connect(db_path)
 track_features_df = get_track_features(conn)
-
 normalized_features = z_score_normalize(track_features_df)
 user_profiles = get_user_profiles(conn, normalized_features)
-
 get_content_based_recommendations(user_profiles, normalized_features)
 print("Finished.")
 conn.close()
