@@ -2,7 +2,7 @@ import sqlite3
 
 
 def delete_recommendations_tables(db_connection):
-    # Delete the tables that hold existing Recommendations to ensure new data from the pipeline
+    # Drop the tables that hold existing Recommendations to ensure new data from the pipeline
     cursor = db_connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS Collaborative_Recommendations")
     cursor.execute("DROP TABLE IF EXISTS Content_Recommendations")
