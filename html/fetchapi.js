@@ -234,6 +234,7 @@ async function deletePlaylist(playlistID){
         method: 'DELETE'
     })
 
+    location.reload()
     listPlaylists() // refresh sidebar list
 }
 
@@ -244,12 +245,16 @@ async function getPlaylistTracks(id){
     const tracks = await res.json()
     const container = document.getElementById(`tracks-${id}`)
 
-    container.innerHTML = tracks.map(track => `
+    container.innerHTML = tracks.map(track => {
+        const scoreHTML = track.score != null ? `<em class="track-score">(score: ${(track.score * 100).toFixed(2)}%)</em>` : ""
+
+        return `
         <div>
-            <p>${track.name} - ${track.artist}</p>
+            <p><strong>${track.name} - ${track.artist}</strong> ${scoreHTML}</p>
             <button class="delete-btn" onclick="deleteTrack('${id}', '${track.id}')" id="del-track">X</button>
         </div>
-    `).join("")
+        `
+    }).join("")
 }
 
 // delete a track from playlist

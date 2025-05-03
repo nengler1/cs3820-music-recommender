@@ -774,7 +774,7 @@ app.post('/api/me/recommendations', (req, res) => {
 		//const user_name = tracks[0].user_name
 
 		// JSON list of top songs in playlist
-		const reccomendations = tracks.map(track => ({
+		const recommendations = tracks.map(track => ({
 			track_id: track.track_id,
 			track_name: track.track_name,
 			artist_name: track.artist_name,
@@ -794,18 +794,18 @@ app.post('/api/me/recommendations', (req, res) => {
 				const new_playlist_ID = this.lastID
 
 				const insert_track = db.prepare(`
-					INSERT INTO Tracks_for_Playlists (name, artist, uri, playlist_id)
-					VALUES (?, ?, ?, ?)
+					INSERT INTO Tracks_for_Playlists (name, artist, uri, playlist_id, score)
+					VALUES (?, ?, ?, ?, ?)
 				`)
 
-				reccomendations.forEach(track => {
+				recommendations.forEach(track => {
 					const uri = `spotify:track:${track.track_id}`
-					insert_track.run([track.track_name, track.artist_name, uri, new_playlist_ID])
+					insert_track.run([track.track_name, track.artist_name, uri, new_playlist_ID, track.score])
 				})
 
 				insert_track.finalize()
 
-				res.status(201).json({id: new_playlist_ID, title})
+				res.status(201).json({id: new_playlist_ID, title, recommendations})
 			}
 		)
 	})

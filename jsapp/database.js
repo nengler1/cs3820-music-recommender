@@ -118,20 +118,23 @@ db.serialize(() => {
         score REAL,
         PRIMARY KEY (user_id, track_id)
     );`)
-
+    
     // alter table
     /*
     db.run(`ALTER TABLE Track 
-        ADD COLUMN artist_name VARCHAR(255)
+    ADD COLUMN artist_name VARCHAR(255)
     ;`)
     db.run(`ALTER TABLE Track 
-        ADD COLUMN album_name VARCHAR(255)
+    ADD COLUMN album_name VARCHAR(255)
     ;`)
     db.run(`ALTER TABLE Track 
-        ADD COLUMN album_cover VARCHAR(255)
+    ADD COLUMN album_cover VARCHAR(255)
     ;`)
     db.run(`ALTER TABLE Track
-        ADD COLUMN artist_id VARCHAR(255)
+    ADD COLUMN artist_id VARCHAR(255)
+    ;`)
+    db.run(`ALTER TABLE Tracks_for_Playlists
+    ADD COLUMN score REAL
     ;`)
     */
    

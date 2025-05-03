@@ -216,6 +216,11 @@ p {
     font-weight: bold;
 }
 
+#get-recommendations-form {
+    position: absolute;
+    bottom: 0;
+}
+
 label {
     font-size: 1rem;
     font-weight: 600;
@@ -278,12 +283,17 @@ input[type="file"] {
     overflow-y: auto;
 }
 
+.left-panel {
+    position: relative;
+}
+
 /* Left Panel */
 .left-panel form {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
+    
 }
 
 .left-panel input[type="text"],
@@ -377,6 +387,12 @@ input[type="file"] {
 
 .track-list div:last-child {
     border-bottom: none;
+}
+
+.track-score {
+    margin-right: 15px;
+    position: relative;
+    float: inline-end;
 }
 
 #del-track {

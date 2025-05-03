@@ -1,0 +1,69 @@
+/* HW9 */
+* {
+    font-family: "Inter", sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+    background-color: #F6FFEB;
+}
+
+/* Body Layout */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#compass {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    border: 5px solid #333;
+    border-radius: 50%;
+    background-color: #7a7a7a;
+    position: relative;
+}
+
+#needle {
+    width: 5px;
+    height: 130px;
+    background: white;
+    background-image: linear-gradient(red, red);
+    background-size: 100% 50%;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform-origin: center;
+    transform: rotate(0deg);
+}
+
+#status {
+    font-weight: bold;
+}
+
+#enabled {
+    background-color: rgba(34, 151, 61, 0.403);
+    font-weight: bold;
+}
+
+#desc {
+    padding: 30px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    font-size: 60px;
+}
+
+p {
+    font-size: x-large;
+}
