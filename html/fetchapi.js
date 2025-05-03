@@ -15,6 +15,7 @@ async function changeLogin(){
     const loggedIn = await checkLoginStatus()
     console.log("LOGGED IN:", loggedIn)
     const authButton = document.getElementById('auth-btn')
+
     if(loggedIn){
         authButton.innerText = 'Profile'
         authButton.onclick = () => {
@@ -25,6 +26,16 @@ async function changeLogin(){
         create_playlist.textContent = 'Create Playlist'
 
         navbar.appendChild(create_playlist)
+
+        const logout = document.createElement('button')
+        logout.textContent = "Log Out"
+        logout.classList.add('nav-link-btn')
+        logout.onclick = () => {
+            fetch('/api/logout')
+                .then(() => window.location.href = '/')
+                .catch(err => console.log('Logout failed:', err))
+        }
+        navbar.appendChild(logout)
 
         const sync_songs = document.createElement('button')
         sync_songs.innerText = 'Sync Your Songs'

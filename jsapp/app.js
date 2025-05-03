@@ -287,6 +287,22 @@ app.get('/api/me/status', (req, res) => {
 	}
 })
 
+// logout user by destroying the session and redirect to home
+app.get('/api/logout', (req, res) => {
+	req.session.destroy(err => {
+	  if (err) {
+		console.error('Logout error:', err);
+		// even if there’s an error, clear the cookie client-side
+		res.clearCookie('connect.sid').status(500).json({ error: 'Failed to log out' });
+	  } else {
+		// clear the session cookie & send user back to the landing page
+		res.clearCookie('connect.sid');
+		res.redirect('/');
+	  }
+	});
+  });
+  
+
 // function to quickly use the Spotify API endpoints
 async function fetchWebApi(endpoint, accessToken){
 	try {

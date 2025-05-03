@@ -508,6 +508,7 @@ input[type="file"] {
 #search-results {
     padding: 10px;
     display: flex;
+    color: black;
     flex-direction: column;
     gap: 10px;
 }
