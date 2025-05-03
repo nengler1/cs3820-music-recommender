@@ -1,5 +1,6 @@
 const artist_div = document.querySelector('.spotify-track')
 const navbar = document.querySelector('.nav-links')
+const left_nav = document.querySelector('.left-nav')
 
 // check if the user is logged in
 async function checkLoginStatus(){
@@ -35,7 +36,7 @@ async function changeLogin(){
                 .then(() => window.location.href = '/')
                 .catch(err => console.log('Logout failed:', err))
         }
-        navbar.appendChild(logout)
+        left_nav.prepend(logout)
 
         const sync_songs = document.createElement('button')
         sync_songs.innerText = 'Sync Your Songs'
