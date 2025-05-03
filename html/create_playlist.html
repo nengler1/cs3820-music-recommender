@@ -7,6 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
     <title>Melofy - Create Playlist</title>
 </head>
 <body>
@@ -17,7 +21,12 @@
         <div class="nav-links">
             <a href="/">Home</a>
             <button id="auth-btn" class="nav-link-btn"></button>
+
         </div>
+        <button id="theme-toggle" class="nav-link-btn" title="Toggle dark/light mode">
+            <i id="icon-moon" class="fa-solid fa-moon fa-fw"></i>
+            <i id="icon-sun"  class="fa-solid fa-sun fa-fw"  style="display: none;"></i>
+        </button>
     </nav>
 
     <main class="dashboard">
@@ -64,5 +73,6 @@
 
     <script src="fetchapi.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@1.0.16/dist/browser-image-compression.js"></script>
+    <script src="dark_light_mode.js"></script>
 </body>
 </html>

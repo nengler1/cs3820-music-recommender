@@ -1,3 +1,56 @@
+:root {
+    /* Base backgrounds & text */
+    --bg:               #F6FFEB; /* page background */
+    --text:             #000000; /* default text */
+
+    /* Navbar */
+    --nav-bg:           #054740;
+    --nav-text:         #F6FFEB;
+
+    /* Hero section */
+    --hero-bg:          #093E48;
+    --hero-text:        #ffffff;
+
+    /* Panels (playlists dashboard, form-container, etc.) */
+    --panel-bg:         #ffffff;
+    --panel-text:       #000000;
+
+    /* Inputs & forms */
+    --input-bg:         #ffffff;
+    --input-text:       #000000;
+    --input-title:      #093E48;
+
+    /* Accent colors */
+    --secondary:        #5E8C61; /* muted green */
+    --secondary-dark:   #093E48; /* darker green */
+    --spotify-green:    #1DB954;
+    --spotify-green-dark: #168f3d;
+
+    /* Error / delete buttons */
+    --error:            #c0392b;
+    --error-dark:       #e74c3c;
+}
+
+.dark-mode {
+    /* Swap the core palette */
+    --bg:               #323232;
+    --text:             #e0e0e0;
+
+    --nav-bg:           #054740;
+    --nav-text:         #e0e0e0;
+
+    --hero-bg:          #093E48;
+    --hero-text:        #ffffff;
+
+    --panel-bg:         #424242;
+    --panel-text:       #e0e0e0;
+
+    --input-bg:         #2c2c2c;
+    --input-text:       #e0e0e0;
+    --input-title:      #F6FFEB;
+}
+  
+
 /* General Styling */
 * {
     font-family: "Inter", sans-serif;
@@ -8,7 +61,8 @@
 
 html {
     height: 100%;
-    background-color: #F6FFEB; /* Light cream */
+    background-color: var(--bg); /* Light cream */
+    transition: 0.3s;
 }
 
 /* Body Layout */
@@ -19,6 +73,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: var(--text);
+    transition: 0.3s;
 }
 
 li.dancer {
@@ -56,12 +112,13 @@ nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #054740; /* Dark green */
+    background: var(--nav-bg); /* Dark green */
     padding: 10px 20px;
     margin-bottom: 20px;
     width: 100%;
     box-sizing: border-box;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
 }
 
 .nav-links {
@@ -71,7 +128,7 @@ nav {
 
 .nav-links a {
     font-size: 1.2rem;
-    color: #F6FFEB; /* Light text */
+    color: var(--nav-text); /* Light text */
     text-decoration: none;
     font-weight: bold;
     padding: 10px;
@@ -83,7 +140,7 @@ nav {
 .nav-link-btn {
     background: none;
     border: none;
-    color: #F6FFEB; /* Light text */
+    color: var(--nav-text); /* Light text */
     font-size: 1.2rem;
     font-weight: bold;
     text-decoration: none;
@@ -91,22 +148,25 @@ nav {
     padding: 10px;
     margin: 0;
     display: inline;
+    transition: 0.3s;
 }
 
 .nav-links a:hover, .nav-link-btn:hover {
-    background-color: white;
-    color: #5E8C61;
+    background-color: var(--bg);
+    color: var(--secondary);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
 }
 
 /* Hero Section */
 .hero {
-    background: #093E48;
-    color: white;
+    background: var(--hero-bg);
+    color: var(--hero-text);
     padding: 60px 20px;
     text-align: center;
     width: 100%;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
 }
 
 .hero h1 {
@@ -120,9 +180,9 @@ p {
 }
 
 .login-btn {
-    background: #5E8C61;
+    background: var(--secondary);
+    color: var(--hero-text);
     text-decoration: none;
-    color: white;
     font-size: 1.2rem;
     padding: 12px 20px;
     border-radius: 8px;
@@ -130,14 +190,14 @@ p {
 }
 
 .login-btn:hover {
-    background: #054740;
+    background: var(--hero-bg);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* Loading Spinner */
 .spinner {
-    border: 4px solid #F6FFEB;
-    border-top: 4px solid #1DB954; /* Spotify green */
+    border: 4px solid var(--bg);
+    border-top: 4px solid var(--spotify-green);
     border-radius: 50%;
     width: 30px;
     height: 30px;
@@ -195,17 +255,19 @@ p {
 .form-container {
     margin: 20px;
     padding: 15px;
-    background: #5E8C61; /* Muted green */
+    background: var(--secondary); /* Muted green */
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     width: 90%;
     max-width: 500px;
-    color: white;
+    color: var(--hero-text);
+    transition: 0.3s;
 }
 
 #create-playlist-form {
     font-size: x-large;
-    color: #093E48;
+    color: var(--input-title);
+    transition: 0.3s;
 }
 
 
@@ -226,7 +288,8 @@ label {
     font-weight: 600;
     display: block;
     margin-bottom: 5px;
-    color: #000000;
+    color: var(--text);
+    transition: 0.3s;
 }
 
 input {
@@ -235,7 +298,9 @@ input {
     border-radius: 5px;
     border: 1px solid gray;
     margin-bottom: 10px;
-    background: white;
+    background: var(--input-bg);
+    color: var(--input-text);
+    transition: 0.3s;
 }
 
 input[type="submit"], button {
@@ -243,20 +308,22 @@ input[type="submit"], button {
     padding: 10px;
     border-radius: 5px;
     border: none;
-    color: white;
-    background-color: #054740;
+    color: var(--nav-text);
+    background-color: var(--nav-bg);
     cursor: pointer;
     transition: 0.3s;
 }
 
 input[type="submit"]:hover, button:hover {
-    background-color: #093E48; /* Dark border */
+    background-color: var(--secondary-dark);
+    transition: 0.3s;
 }
 
 input[type="file"] {
-    color: rgb(0, 0, 0); /* or any visible color */
-    background-color: white;
+    background-color: var(--input-bg);
+    color: var(--input-text);
     width: 100%;
+    transition: 0.3s;
 }
 
 /* Profile */
@@ -276,11 +343,13 @@ input[type="file"] {
 }
 
 .left-panel, .middle-panel, .right-panel {
-    background: #ffffff;
+    background: var(--panel-bg);
+    color: var(--panel-text);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
+    transition: 0.3s;
 }
 
 .left-panel {
@@ -305,8 +374,8 @@ input[type="file"] {
 
 .left-panel button {
     padding: 10px;
-    background-color: #054740;
-    color: white;
+    background-color: var(--nav-bg);
+    color: var(--nav-text);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -314,18 +383,21 @@ input[type="file"] {
 }
 
 .left-panel button:hover {
-    background-color: #093E48;
+    background-color: var(--secondary-dark);
+    transition: 0.3s;
 }
 
 .left-panel #playlist-loc {
     font-size: x-large;
-    color: #093E48;
+    color: var(--input-title);
+    transition: 0.3s;
 }
 
 #playlist-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    transition: 0.3s;
 }
 
 .playlist-item {
@@ -333,6 +405,7 @@ input[type="file"] {
     margin: 2px 0;
     padding: 4px;
     background: #f3fff0;
+    color: #000000;
     border-radius: 5px;
     transition: 0.3s;
 }
@@ -376,13 +449,15 @@ input[type="file"] {
 .track-list {
     margin-top: 10px;
     padding: 10px;
+    color: black;
     background: #f1f1f1;
     border-radius: 8px;
 }
 
 .track-list div {
     padding: 5px;
-    border-bottom: 1px solid #093E48;
+    border-bottom: 1px solid var(--hero-bg);
+    transition: 0.3s;
 }
 
 .track-list div:last-child {
@@ -399,21 +474,23 @@ input[type="file"] {
     position: relative;
     float: inline-end;
     background: white;
-    color: #c0392b;
-    border: 1px solid #c0392b;
+    color: var(--error);
+    border: 1px solid var(--error);
     transition: 0.3s;
     transform: translate(0, -100%);
 }
 
 #del-track:hover {
-    background: #e74c3c;
+    background: var(--error-dark);
     color: white;
+    transition: 0.3s;
 }
 
 /* Right Panel */
 #search-title {
     font-size: x-large;
-    color: #093E48;
+    color: var(--input-title);
+    transition: 0.3s;
 }
 .right-panel form {
     display: flex;
@@ -445,18 +522,19 @@ input[type="file"] {
 }
 
 #search-results button {
-    background: #5E8C61;
+    background: var(--secondary);
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 #export-button {
     margin-top: auto;
-    background-color: #1DB954;
-    color: white;
+    background-color: var(--spotify-green);
+    color: rgb(50, 50, 50);
     font-weight: bold;
     border: none;
     padding: 15px;
@@ -467,7 +545,8 @@ input[type="file"] {
 }
 
 #export-button:hover {
-    background-color: #168f3d;
+    color: white;
+    background-color: var(--spotify-green-dark);
 }
 
 
@@ -476,44 +555,44 @@ input[type="file"] {
     display: inline-block;
     padding: 10px 15px;
     border-radius: 5px;
-    color: white;
+    color: var(--hero-text);
     background-color: #054740;
     text-decoration: none;
     transition: 0.3s;
 }
 
 .button:hover {
-    background-color: #093E48;
+    background-color: var(--hero-bg);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
 .delete-btn {
-    background: #c0392b;
+    background: var(--error);
 }
 
 .delete-btn:hover {
-    background: #e74c3c;
+    background: var(--error-dark);
 }
 
 #del-playlist {
     position: relative;
     float: inline-end;
     background: white;
-    color: #c0392b;
-    border: 1px solid #c0392b;
+    color: var(--error);
+    border: 1px solid var(--error);
     transition: 0.3s;
     transform: translate(-50%, 50%);
 }
 
 #del-playlist:hover {
-    background: #e74c3c;
+    background: var(--error-dark);
     color: white;
 }
 
 /* Authentication Page Styling */
 .auth-container {
     width: 350px;
-    background: white;
+    background: var(--panel-bg);
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -532,6 +611,8 @@ input[type="file"] {
     margin: 10px 0;
     border-radius: 5px;
     border: 1px solid gray;
+    background: var(--input-bg);
+    color: var(--input-text);
 }
 
 .auth-container button {
@@ -540,18 +621,18 @@ input[type="file"] {
     font-size: 1rem;
     border-radius: 5px;
     border: none;
-    background: #054740;
-    color: white;
+    background: var(--nav-bg);
+    color: var(--nav-text);
     cursor: pointer;
     transition: 0.3s;
 }
 
 .auth-container button:hover {
-    background: #5E8C61;
+    background: var(--secondary);
 }
 
 .spotify-login-btn {
-    background: #1DB954; /* Spotify Green */
+    background: var(--spotify-green);
     color: white;
     font-weight: bold;
 }
