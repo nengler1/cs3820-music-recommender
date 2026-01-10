@@ -1,4 +1,4 @@
-# Spotify Music Recommender
+#Melofy - AI Spotify Music Recommender
 
 The Music Recommender was developed by Nathan Engler and Robert Kroleski as a semester project for CS3820: Introduction to Artificial Intelligence at the University of Colrado at Colorado Springs.
 This Github represents the culmination of their work and is provided as an Open Source project for anyone seeking to experiment with recommender systems or expand its current capabilities.
